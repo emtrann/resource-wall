@@ -1,7 +1,7 @@
 .sidenav {
   margin: 0;
   padding: 0;
-  width: 300px;
+  width: 225px;
   background-color: white;
   position: fixed;
   height: 100%;
@@ -21,7 +21,7 @@
   margin-top: 1em;
   width: 175px;
   height: 125px;
-  margin-left: 3em;
+  margin-left: 1em;
 }
 
 .sidenav a.active {
@@ -41,6 +41,25 @@
   width: 100%;
   font-size: 20px;
   margin-top: 3em;
-  margin-left: 1em;
+  border-bottom: 1px solid black;
 
+}
+
+input[type=text], input[type=password] {
+  width: 100%;
+  padding: 12px 20px;
+  margin: 8px 0;
+  display: inline-block;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
+}
+
+button {
+  background-color: yellow;
+  color: black;
+  padding: 10px 15px;
+  margin: 8px 0;
+  border: none;
+  cursor: pointer;
+  width: 100%;
 }
