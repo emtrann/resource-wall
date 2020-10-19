@@ -38,6 +38,7 @@ const homepageRoutes = require("./routes/homepage");
 const individualResourceRoutes = require("./routes/individualResource");
 const newResourceRoutes = require("./routes/newResource");
 const register = require("./routes/register");
+const categories = require("./routes/categories");
 
 
 // NOT ACTUALLY SURE WHAT THIS DOES HERE -m
@@ -46,9 +47,11 @@ const register = require("./routes/register");
 app.use("/api/users", usersRoutes(db));
 // Note: mount other resources here, using the same pattern above
 app.use("/homepage", homepageRoutes(db));
-app.use("/:individualresource", individualResourceRoutes(db));
+app.use("/resource/:individualresource", individualResourceRoutes(db));
 app.use("/newresource", newResourceRoutes(db));
 app.use("/register", register(db));
+app.use("/category/:categoryID", categories(db));
+
 // UP UNTIL HERE
 
 // Home page
@@ -70,15 +73,22 @@ app.get("/newresource", (req, res) => {
   res.render("newResource")
 })
 
+// route for individual categories
+app.get("/category/:categoryID", (req, res) => {
+  res.render("categories")
+})
+
 // route to register
 app.get("/register", (req, res) => {
   res.render("register")
 })
 
+
 // route for individual resources
-app.get("/:individualresource", (req, res) => {
+app.get("/resource/:individualresource", (req, res) => {
   res.render("individualResource")
 })
+
 
 // POST routes
 
