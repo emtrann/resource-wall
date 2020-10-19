@@ -34,5 +34,30 @@
       <a href="/register">Register</a>
       <a href="#categories">Categories</a>
     </div>
+
+    <main style="margin: 1em;">
+      <h3>Featured Resources</h3>
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">Title</th>
+            <th scope="col">URL</th>
+            <th scope="col">Description</th>
+
+          </tr>
+        </thead>
+        <tbody>
+          <% for(let resource in resources) { %>
+            <tr>
+              <td><%= resources[resource].title %></td>
+              <td><%= resources[resource].URL %></td>
+              <td><%= resources[resource].description %></td>
+
+            </tr>
+          <% } %>
+        </tbody>
+      </table>
+    </main>
+
   </body>
 </header>
