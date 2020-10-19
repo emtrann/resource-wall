@@ -1,7 +1,7 @@
 .sidenav {
   margin: 0;
   padding: 0;
-  width: 350px;
+  width: 300px;
   background-color: white;
   position: fixed;
   height: 100%;
@@ -19,8 +19,9 @@
 
 .sidenav img {
   margin-top: 1em;
-  width: 200px;
-  height: 150px;
+  width: 175px;
+  height: 125px;
+  margin-left: 3em;
 }
 
 .sidenav a.active {
