@@ -1,0 +1,31 @@
+DROP TABLE IF EXISTS resources CASCADE;
+DROP TABLE IF EXISTS resource_ratings CASCADE;
+DROP TABLE IF EXISTS comments CASCADE;
+DROP TABLE IF EXISTS user_likes CASCADE;
+
+CREATE TABLE resources (
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+  category_id INTEGER REFERENCES categories(id) ON DELETE CASCADE,
+  url VARCHAR(255) NOT NULL,
+  title VARCHAR(255) NOT NULL,
+  description TEXT
+);
+
+CREATE TABLE resource_ratings (
+  id SERIAL PRIMARY KEY,
+  rating SMALLINT NOT NULL DEFAULT 0,
+  resource_id INTEGER REFERENCES resources(id) ON DELETE CASCADE
+);
+
+CREATE TABLE comments (
+  id SERIAL PRIMARY KEY,
+  resource_id INTEGER REFERENCES resources(id) ON DELETE CASCADE,
+  message TEXT,
+  date TIMESTAMP
+);
+
+CREATE TABLE user_likes (
+  id SERIAL PRIMARY KEY,
+  resource_id INTEGER REFERENCES resources(id) ON DELETE CASCADE
+);
