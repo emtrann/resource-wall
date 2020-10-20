@@ -17,15 +17,24 @@
   </head>
 
   <body>
-    <% if (user) { %>
+
     <div class="sidenav">
       <img class="brain" src="/images/brain.png">
       <form id="SearchResources" method="GET">
         <textarea id="search" placeholder="Search Resources"></textarea>
         <div>
         </div>
-        <h4 style="margin: 1em">Logged In As: <%= user.email %></h4>
-        <button type="submit" class="btn btn-primary" style="margin: 1em">Logout</button>
+      </form>
+      <form method="POST">
+      <div class="sign-in">
+        <label for="username"><b>Username</b></label>
+        <input type="text" placeholder="Enter Username" name="username" required>
+        <label for="psw"><b>Password</b></label>
+        <input type="password" placeholder="Enter Password" name="psw" required>
+        <button type="submit">Login</button>
+      </div>
+      </form>
+      <a href="/register">Register</a>
       <div class="categories">
         <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Categories
           <span class="caret"></span></button>
@@ -38,7 +47,6 @@
         </ul>
         </div>
       </div>
-      <% } %>
     </div>
     </div>
     <div class="main">
