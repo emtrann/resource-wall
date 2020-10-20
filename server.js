@@ -12,7 +12,7 @@ const morgan     = require('morgan');
 
 // AL added
 const bcrypt = require('bcrypt');
-// const cookieSession = require('cookie-session');
+const cookieSession = require('cookie-session');
 
 // PG database client/connection setup
 // const { Pool } = require('pg');
@@ -36,10 +36,10 @@ app.use("/styles", sass({
 app.use(express.static("public"));
 
 // AL added below
-// app.use(cookieSession({
-//   name: 'session',
-//   keys: ['asdf', 'lkjhg']
-// }));
+app.use(cookieSession({
+  name: 'session',
+  keys: ['asdf', 'lkjhg']
+}));
 // Temporary Data to be replaced by Database:
 const resourcesDatabase = {
   1: { URL: 'https://business.tutsplus.com/tutorials/how-to-start-a-business--cms-25638', title: 'Awesome business tutorial!', description: 'All you need to know to start yout own company', userID: "user1" },
@@ -94,6 +94,10 @@ const resourcesForUser = function(database, id) {
   }
   return filteredResources;
 };
+// random string for user ID:
+const generateRandomString = function() {
+  return Math.random().toString(16).slice(2, 7);
+};
 
 // Home page
 // Warning: avoid creating more routes in this file!
@@ -108,7 +112,7 @@ app.get('/', (req, res) => {
   // }
   const userObject = resourcesForUser(resourcesDatabase, 'user1'); // id hardcoded for now
   const templateVars = { resources: userObject }; //, user: 'user1' }; // ?
-  res.render('index', templateVars);
+  res.render('homepage', templateVars);
 });
 
 // homepage for users - redirect here after login + shows liked & saved resources
@@ -127,9 +131,11 @@ app.get("/category/:categoryID", (req, res) => {
 })
 
 // route to register
+// AL added below:
 app.get("/register", (req, res) => {
-  res.render("register")
-})
+  const templateVars = { user: users[req.session.user_id] };
+  res.render("register", templateVars);
+});
 
 
 // route for individual resources
@@ -147,13 +153,21 @@ app.post("/newresource", (req, res) => {
 })
 
 app.post("/register", (req, res) => {
-  // email, password + user = req.body
-  // if forms are empty, return error
-  // helper function? determine that our username/email is not already in the database
-  // OTHERWISE
-  // add user to DB
-  // HASH PASSWORD
-  //redirect to my my resources
+  const newUserId = generateRandomString();
+  const email = req.body.email;
+  const password = req.body.password;
+  const hashedPassword = bcrypt.hashSync(password, 10);
+  if (email === '' || password === '') {
+    res.status(400).json({message: 'Please enter email and password'}); // change to slide down message
+  }
+  for (let user in users) {
+    if (email === users[user].email) {
+      res.status(400).json({message: 'Email already exists'});
+    }
+  }
+  users[newUserId] = { id: newUserId, email: email, password: hashedPassword };
+  req.session.user_id = newUserId;
+  res.redirect('/'); // change route to My Resources
 })
 
 app.post("/logout", (req, res) => {
