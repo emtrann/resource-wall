@@ -186,24 +186,22 @@ app.post("/register", (req, res) => {
 
 //login
 app.post("/", (req, res) => {
-  const { username, password } = req.body;
+  const { username, psw } = req.body;
   let user = findUserByEmail(users, username);
+  console.log(req.body);
+  console.log(user)
 
   if (!user) {
-    console.log(res)
     res.status(403).json({message: "Email cannot be found"});
   } else if (user) {
-    bcrypt.compare(password, user.password, function(err, isPasswordMatched) {
+    bcrypt.compare(psw, user['password'], function(err, isPasswordMatched) {
       if (isPasswordMatched) {
-        req.session.user_id = `${user["userId"]}`;
-        res.redirect("categories");
+        req.session.user_id = `${user["email"]}`;
+        res.redirect("/");
       } else {
         res.render("register", { error: "Incorrect Password", user: user});
       }
     });
-  } else {
-    res.status(403);
-    res.render("register", { error: "No account under this user. Register instead?"});
   }
 });
 
