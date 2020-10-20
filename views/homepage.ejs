@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="/vendor/border-box.css" type="text/css" />
     <link rel="stylesheet" href="/styles/layout.css" type="text/css" />
     <link rel="stylesheet" href="/styles/side-nav.css" type="text/css" />
+    <link rel="stylesheet" href="/styles/resources.css" type="text/css" />
     <!-- <link rel="stylesheet" href="/vendor/layout.css" type="text/css" /> -->
     <!-- font -->
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue:300,300i,700,700i&display=swap" rel="stylesheet">
@@ -23,19 +24,34 @@
         <textarea id="search" placeholder="Search Resources"></textarea>
         <div>
         </div>
-      </form>
-
-      <h4 style="margin: 1em">Logged In As: <%= user.email %></h4>
-      <button type="submit" class="btn btn-primary" style="margin: 1em">Logout</button>
-      <a href="#categories">Categories</a>
+        <h4 style="margin: 1em">Logged In As: <%= user.email %></h4>
+        <button type="submit" class="btn btn-primary" style="margin: 1em">Logout</button>
+      <div class="categories">
+        <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Categories
+          <span class="caret"></span></button>
+        <ul class="dropdown-menu">
+          <a href="#web-development">Web Development</a>
+          <a href="#business">Business</a>
+          <a href="#photography">Photography</a>
+           <a href="#design">Design</a>
+          <a href="#science">Science</a>
+        </ul>
+        </div>
+      </div>
+      <% } %>
     </div>
-    <% } %>
+    </div>
+    <div class="main">
 
-    <main class="feature" style="margin: 1em">
-      <h3>My Resources</h3>
+    <img class="book" src="/images/book.png">
+
+
+    <div class="feature" >
+
+
       <table class="table">
         <thead>
-          <tr>
+          <tr class="table-head">
             <th scope="col">Title</th>
             <th scope="col">URL</th>
             <th scope="col">Description</th>
@@ -44,7 +60,7 @@
         </thead>
         <tbody>
           <% for(let resource in resources) { %>
-            <tr>
+            <tr class="table-row">
               <td><%= resources[resource].title %></td>
               <td><%= resources[resource].URL %></td>
               <td><%= resources[resource].description %></td>
@@ -53,7 +69,7 @@
           <% } %>
         </tbody>
       </table>
-    </main>
-
+    </div>
+  </div>
   </body>
 </html>
