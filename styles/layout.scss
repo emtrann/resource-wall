@@ -1,17 +1,18 @@
 // See: https://sass-lang.com/
 
+// AL comment: this file syncs with public/styles/layout.css
 body {
   background-color: #EEE;
   display: flex;
   // flex: 3;
-  flex-direction: column;
+  flex-direction: row;
   // justify-content: space-around;
 
   h1 {
     color: #244751;
   }
 
-  #feature {
+  .feature {
     // display: flex;
     float: right;
     // flex: 2;
