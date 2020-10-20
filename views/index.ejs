@@ -11,6 +11,7 @@
     <script type="text/javascript" src="/scripts/app.js"></script>
 
   <body>
+
     <div class="sidenav">
       <img class="brain" src="/images/brain.png">
       <form id="SearchResources" method="GET">
@@ -18,8 +19,6 @@
         <div>
         </div>
       </form>
-
-
       <form method="POST">
       <div class="sign-in">
         <label for="username"><b>Username</b></label>
@@ -27,15 +26,14 @@
         <label for="psw"><b>Password</b></label>
         <input type="password" placeholder="Enter Password" name="psw" required>
         <button type="submit">Login</button>
-
       </div>
-    </form>
-
+      </form>
       <a href="/register">Register</a>
       <a href="#categories">Categories</a>
     </div>
 
-    <main style="margin: 1em;">
+
+    <main id="feature" style="margin: 1em">
       <h3>Featured Resources</h3>
       <table class="table">
         <thead>
