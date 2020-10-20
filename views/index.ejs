@@ -11,6 +11,7 @@
     <script type="text/javascript" src="/scripts/app.js"></script>
 
   <body>
+
     <div class="sidenav">
       <img class="brain" src="/images/brain.png">
       <form id="SearchResources" method="GET">
@@ -18,8 +19,6 @@
         <div>
         </div>
       </form>
-
-
       <form method="POST">
       <div class="sign-in">
         <label for="username"><b>Username</b></label>
@@ -27,11 +26,10 @@
         <label for="psw"><b>Password</b></label>
         <input type="password" placeholder="Enter Password" name="psw" required>
         <button type="submit">Login</button>
-
       </div>
-    </form>
-
+      </form>
       <a href="/register">Register</a>
+<<<<<<< HEAD
       <a href="/newresource">Add New Resource</a>
       <div class="categories">
         <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Categories
@@ -45,5 +43,35 @@
         </ul>
         </div>
       </div>
+=======
+      <a href="#categories">Categories</a>
+    </div>
+
+
+    <main id="feature" style="margin: 1em">
+      <h3>Featured Resources</h3>
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">Title</th>
+            <th scope="col">URL</th>
+            <th scope="col">Description</th>
+
+          </tr>
+        </thead>
+        <tbody>
+          <% for(let resource in resources) { %>
+            <tr>
+              <td><%= resources[resource].title %></td>
+              <td><%= resources[resource].URL %></td>
+              <td><%= resources[resource].description %></td>
+
+            </tr>
+          <% } %>
+        </tbody>
+      </table>
+    </main>
+
+>>>>>>> 809ca1caacb3160e537fc216b00840036d69ea6c
   </body>
 </header>
