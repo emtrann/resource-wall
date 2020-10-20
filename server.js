@@ -15,10 +15,10 @@ const bcrypt = require('bcrypt');
 const cookieSession = require('cookie-session');
 
 // PG database client/connection setup
-// const { Pool } = require('pg');
-// const dbParams = require('./lib/db.js');
-// const db = new Pool(dbParams);
-// db.connect();
+const { Pool } = require('pg');
+const dbParams = require('./lib/db.js');
+const db = new Pool(dbParams);
+db.connect();
 
 // Load the logger first so all (static) HTTP requests are logged to STDOUT
 // 'dev' = Concise output colored by response status for development use.
@@ -67,18 +67,21 @@ const individualResourceRoutes = require("./routes/individualResource");
 const newResourceRoutes = require("./routes/newResource");
 const register = require("./routes/register");
 const categories = require("./routes/categories");
+const login = require("./routes/login-route.js");
 
 
 // NOT ACTUALLY SURE WHAT THIS DOES HERE -m
 // Mount all resource routes
 // Note: Feel free to replace the example routes below with your own
-// app.use("/api/users", usersRoutes(db));
+app.use("/api/users", usersRoutes(db));
 // // Note: mount other resources here, using the same pattern above
-// app.use("/homepage", homepageRoutes(db));
-// app.use("/resource/:individualresource", individualResourceRoutes(db));
-// app.use("/newresource", newResourceRoutes(db));
-// app.use("/register", register(db));
-// app.use("/category/:categoryID", categories(db));
+app.use("/homepage", homepageRoutes(db));
+app.use("/resource/:individualresource", individualResourceRoutes(db));
+app.use("/newresource", newResourceRoutes(db));
+app.use("/register", register(db));
+app.use("/category/:categoryID", categories(db));
+
+app.use("/", login(db))
 
 // UP UNTIL HERE
 
@@ -170,9 +173,11 @@ app.post("/register", (req, res) => {
   res.redirect('/'); // change route to My Resources
 })
 
+//login
+
 app.post("/logout", (req, res) => {
-  // CLEAR COOKIE
-  // redirect to root page
+  req.session = null;
+  res.redirect("/");
 })
 
 
