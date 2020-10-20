@@ -142,7 +142,12 @@ app.get("/homepage", (req, res) => {
 
 // route to make a new resource
 app.get("/newresource", (req, res) => {
-  res.render("newResource")
+  if (!req.session.user_id) {
+    res.redirect('/register');
+  }
+  const userObject = resourcesForUser(resourcesDatabase, req.session.user_id);
+  const templateVars = { resources: userObject, user: users[req.session.user_id] };
+  res.render("newResource", templateVars);
 })
 
 // route for individual categories
@@ -170,6 +175,14 @@ app.post("/newresource", (req, res) => {
   // let title = form input title
   // take in req information and push it to database
   //redirect to my my resources
+  const newCategoryId = generateRandomString();
+  const url = req.body.url;
+  const title = req.body.title;
+  const description = req.body.description;
+  const category = req.body.category;
+  //find user by email and use userID
+  resourcesDatabase[newCategoryId] = { URL: url, title: title, description: description, userID: 'user2', category: category };
+  res.redirect('/homepage');
 })
 
 app.post("/register", (req, res) => {
