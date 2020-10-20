@@ -112,12 +112,18 @@ app.get('/', (req, res) => {
   // }
   const userObject = resourcesForUser(resourcesDatabase, 'user1'); // id hardcoded for now
   const templateVars = { resources: userObject }; //, user: 'user1' }; // ?
-  res.render('homepage', templateVars);
+  res.render('guestpage', templateVars);
 });
 
 // homepage for users - redirect here after login + shows liked & saved resources
+// AL added below:
 app.get("/homepage", (req, res) => {
-  res.render("homepage");
+  if (!req.session.user_id) {
+    res.redirect('/register');
+  }
+  const userObject = resourcesForUser(resourcesDatabase, req.session.user_id);
+  const templateVars = { resources: userObject, user: users[req.session.user_id] };
+  res.render("homepage", templateVars);
 })
 
 // route to make a new resource
@@ -167,7 +173,7 @@ app.post("/register", (req, res) => {
   }
   users[newUserId] = { id: newUserId, email: email, password: hashedPassword };
   req.session.user_id = newUserId;
-  res.redirect('/'); // change route to My Resources
+  res.redirect('homepage');
 })
 
 app.post("/logout", (req, res) => {
