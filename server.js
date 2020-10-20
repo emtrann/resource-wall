@@ -15,10 +15,10 @@ const bcrypt = require('bcrypt');
 const cookieSession = require('cookie-session');
 
 // PG database client/connection setup
-// const { Pool } = require('pg');
-// const dbParams = require('./lib/db.js');
-// const db = new Pool(dbParams);
-// db.connect();
+const { Pool } = require('pg');
+const dbParams = require('./lib/db.js');
+const db = new Pool(dbParams);
+db.connect();
 
 // Load the logger first so all (static) HTTP requests are logged to STDOUT
 // 'dev' = Concise output colored by response status for development use.
@@ -67,20 +67,34 @@ const individualResourceRoutes = require("./routes/individualResource");
 const newResourceRoutes = require("./routes/newResource");
 const register = require("./routes/register");
 const categories = require("./routes/categories");
+// const login = require("./routes/login-route.js");
 
 
 // NOT ACTUALLY SURE WHAT THIS DOES HERE -m
 // Mount all resource routes
 // Note: Feel free to replace the example routes below with your own
-// app.use("/api/users", usersRoutes(db));
+app.use("/api/users", usersRoutes(db));
 // // Note: mount other resources here, using the same pattern above
-// app.use("/homepage", homepageRoutes(db));
-// app.use("/resource/:individualresource", individualResourceRoutes(db));
-// app.use("/newresource", newResourceRoutes(db));
-// app.use("/register", register(db));
-// app.use("/category/:categoryID", categories(db));
+app.use("/homepage", homepageRoutes(db));
+app.use("/resource/:individualresource", individualResourceRoutes(db));
+app.use("/newresource", newResourceRoutes(db));
+app.use("/register", register(db));
+app.use("/category/:categoryID", categories(db));
+
+// app.use("/", login(db))
 
 // UP UNTIL HERE
+
+const findUserByEmail = (usersDb, email) => {
+  for (let user in usersDb) {
+    const userObj = usersDb[user];
+    if (userObj['email'] === email) {
+      console.log(userObj['email'])
+      return userObj;
+    }
+  }
+  return false;
+};
 
 // AL added below:
 // returns an object containing all resouces for a given userID:
@@ -176,9 +190,30 @@ app.post("/register", (req, res) => {
   res.redirect('homepage');
 })
 
+//login
+app.post("/", (req, res) => {
+  const { username, psw } = req.body;
+  let user = findUserByEmail(users, username);
+  console.log(req.body);
+  console.log(user)
+
+  if (!user) {
+    res.status(403).json({message: "Email cannot be found"});
+  } else if (user) {
+    bcrypt.compare(psw, user['password'], function(err, isPasswordMatched) {
+      if (isPasswordMatched) {
+        req.session.user_id = `${user["email"]}`;
+        res.redirect("/");
+      } else {
+        res.render("register", { error: "Incorrect Password", user: user});
+      }
+    });
+  }
+});
+
 app.post("/logout", (req, res) => {
-  // CLEAR COOKIE
-  // redirect to root page
+  req.session = null;
+  res.redirect("/");
 })
 
 
