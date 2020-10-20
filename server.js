@@ -67,7 +67,7 @@ const individualResourceRoutes = require("./routes/individualResource");
 const newResourceRoutes = require("./routes/newResource");
 const register = require("./routes/register");
 const categories = require("./routes/categories");
-const login = require("./routes/login-route.js");
+// const login = require("./routes/login-route.js");
 
 
 // NOT ACTUALLY SURE WHAT THIS DOES HERE -m
@@ -81,9 +81,20 @@ app.use("/newresource", newResourceRoutes(db));
 app.use("/register", register(db));
 app.use("/category/:categoryID", categories(db));
 
-app.use("/", login(db))
+// app.use("/", login(db))
 
 // UP UNTIL HERE
+
+const findUserByEmail = (usersDb, email) => {
+  for (let user in usersDb) {
+    const userObj = usersDb[user];
+    if (userObj['email'] === email) {
+      console.log(userObj['email'])
+      return userObj;
+    }
+  }
+  return false;
+};
 
 // AL added below:
 // returns an object containing all resouces for a given userID:
@@ -174,6 +185,27 @@ app.post("/register", (req, res) => {
 })
 
 //login
+app.post("/", (req, res) => {
+  const { username, password } = req.body;
+  let user = findUserByEmail(users, username);
+
+  if (!user) {
+    console.log(res)
+    res.status(403).json({message: "Email cannot be found"});
+  } else if (user) {
+    bcrypt.compare(password, user.password, function(err, isPasswordMatched) {
+      if (isPasswordMatched) {
+        req.session.user_id = `${user["userId"]}`;
+        res.redirect("categories");
+      } else {
+        res.render("register", { error: "Incorrect Password", user: user});
+      }
+    });
+  } else {
+    res.status(403);
+    res.render("register", { error: "No account under this user. Register instead?"});
+  }
+});
 
 app.post("/logout", (req, res) => {
   req.session = null;
