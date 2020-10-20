@@ -42,9 +42,9 @@ app.use(cookieSession({
 }));
 // Temporary Data to be replaced by Database:
 const resourcesDatabase = {
-  1: { URL: 'https://business.tutsplus.com/tutorials/how-to-start-a-business--cms-25638', title: 'Awesome business tutorial!', description: 'All you need to know to start yout own company', userID: "user1" },
-  2: { URL: 'https://www.khanacademy.org/science/high-school-physics', title: 'Physics 101', description: 'The best way to learn physics!', userID: "user1" },
-  3: { URL: 'https://www.freecodecamp.org/news/free-online-programming-cs-courses/', title: 'Software development tutorial', description: 'Well explain software development intro', userID: "user2" }
+  1: { URL: 'https://business.tutsplus.com/tutorials/how-to-start-a-business--cms-25638', title: 'Awesome business tutorial!', description: 'All you need to know to start yout own company', userID: "user1", category: "Business" },
+  2: { URL: 'https://www.khanacademy.org/science/high-school-physics', title: 'Physics 101', description: 'The best way to learn physics!', userID: "user1", category: "Science" },
+  3: { URL: 'https://www.freecodecamp.org/news/free-online-programming-cs-courses/', title: 'Software development tutorial', description: 'Well explain software development intro', userID: "user2", category: "Software Development" }
 };
 const users = {
   "user1": {
@@ -111,7 +111,7 @@ app.get('/', (req, res) => {
   //   res.redirect('/login');
   // }
   const userObject = resourcesForUser(resourcesDatabase, 'user1'); // id hardcoded for now
-  const templateVars = { resources: userObject }; //, user: 'user1' }; // ?
+  const templateVars = { resources: userObject };
   res.render('guestpage', templateVars);
 });
 

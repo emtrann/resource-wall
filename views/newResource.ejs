@@ -1,19 +1,65 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>Home Page</title>
+    <title>New Resource Page</title>
 
     <link rel="stylesheet" href="/vendor/normalize-4.1.1.css" type="text/css" />
     <link rel="stylesheet" href="/vendor/border-box.css" type="text/css" />
     <link rel="stylesheet" href="/styles/layout.css" type="text/css" />
-    <link rel="stylesheet" href="/vendor/side-nav.css" type="text/css" />
-
+    <link rel="stylesheet" href="/styles/side-nav.css" type="text/css" />
+    <!-- font -->
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue:300,300i,700,700i&display=swap" rel="stylesheet">
     <script type="text/javascript" src="/vendor/jquery-3.0.0.js"></script>
     <script type="text/javascript" src="/scripts/app.js"></script>
   </head>
 
   <body>
-    <%- include('index') %>
-    <h1>Put stuff here to add a resource</h1>
+    <% if (user) { %>
+      <div class="sidenav">
+        <img class="brain" src="/images/brain.png">
+        <form id="SearchResources" method="GET">
+          <textarea id="search" placeholder="Search Resources"></textarea>
+          <div>
+          </div>
+        </form>
+
+        <h4 style="margin: 1em">Logged In As: <%= user.email %></h4>
+        <button type="submit" class="btn btn-primary" style="margin: 1em">Logout</button>
+        <a href="#categories">Categories</a>
+      </div>
+    <% } %>
+
+    <main class="feature" style="margin: 1em;">
+      <h2>Add New Resource</h2>
+      <form class="form-inline" action="/newresource" method="POST">
+        <h5>
+        <div class="form-group mb-2">
+          <label for="email">Title:</label>
+          <input class="form-control" type="text" name="title" placeholder="Add title" style="width: 300px; margin: 1em">
+        </div>
+        </h5>
+        <h5>
+          <div class="form-group mb-2">
+            <label for="email">Description:</label>
+            <input class="form-control" type="text" name="description" placeholder="Add description" style="width: 300px; margin: 1em">
+          </div>
+        </h5>
+        <h5>
+          <div class="form-group mb-2">
+            <label for="email">Category:</label>
+            <input class="form-control" type="text" name="category" placeholder="" style="width: 300px; margin: 1em">
+          </div>
+        </h5>
+        <h5>
+        <div class="form-group mb-2">
+          <label for="password">Link:</label>
+          <input class="form-control" type="text" name="link" placeholder="http://" style="width: 300px; margin: 1em">
+          <button type="submit" class="btn btn-primary">Submit</button>
+        </div>
+        </h5>
+      </form>
+
+    </main>
+
   </body>
 </html>
