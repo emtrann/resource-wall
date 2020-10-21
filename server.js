@@ -9,6 +9,8 @@ const bodyParser = require("body-parser");
 const sass       = require("node-sass-middleware");
 const app        = express();
 const morgan     = require('morgan');
+// const databaseQueries = require('/queries')
+
 
 // AL added
 const bcrypt = require('bcrypt');
@@ -19,6 +21,26 @@ const { Pool } = require('pg');
 const dbParams = require('./lib/db.js');
 const db = new Pool(dbParams);
 db.connect();
+
+const pool = new Pool({
+  user: 'vagrant',
+  username: 'labber',
+  password: '123',
+  host: 'localhost',
+  database: 'midterm'
+});
+
+const getResources = function(options) {
+  let queryString = `
+  SELECT *
+  FROM resources;`;
+  return pool.query(queryString)
+  .then(res => console.log(res.rows))
+  .catch(err => console.error('query error', err.stack));
+};
+
+getResources();
+
 
 // Load the logger first so all (static) HTTP requests are logged to STDOUT
 // 'dev' = Concise output colored by response status for development use.
@@ -73,7 +95,7 @@ const categories = require("./routes/categories");
 // NOT ACTUALLY SURE WHAT THIS DOES HERE -m
 // Mount all resource routes
 // Note: Feel free to replace the example routes below with your own
-app.use("/api/users", usersRoutes(db));
+// app.use("/api/users", usersRoutes(db));
 // // Note: mount other resources here, using the same pattern above
 app.use("/homepage", homepageRoutes(db));
 app.use("/resource/:individualresource", individualResourceRoutes(db));
