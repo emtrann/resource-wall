@@ -17,29 +17,40 @@ const bcrypt = require('bcrypt');
 const cookieSession = require('cookie-session');
 
 // PG database client/connection setup
-const { Pool } = require('pg');
-const dbParams = require('./lib/db.js');
-const db = new Pool(dbParams);
-db.connect();
+const { Client } = require('pg');
+// const dbParams = require('./lib/db.js');
+// const db = new Pool(dbParams);
 
-const pool = new Pool({
+const pool = new Client({
   user: 'vagrant',
   username: 'labber',
   password: '123',
   host: 'localhost',
   database: 'midterm'
 });
+pool.connect();
 
-const getResources = function(options) {
+
+
+const getResources = function() {
   let queryString = `
   SELECT *
   FROM resources;`;
-  return pool.query(queryString)
-  .then(res => console.log(res.rows))
+
+  const query = {
+    text: queryString,
+    rowMode: 'array' }
+
+  return pool.query(query)
+  .then(res => (res.rows.map(row => ({
+    user: row[1],
+    category: row[2],
+    url: row[3],
+    title: row[4],
+    description: row[5]
+  }))))
   .catch(err => console.error('query error', err.stack));
 };
-
-getResources();
 
 
 // Load the logger first so all (static) HTTP requests are logged to STDOUT
@@ -68,6 +79,7 @@ const resourcesDatabase = {
   2: { URL: 'https://www.khanacademy.org/science/high-school-physics', title: 'Physics 101', description: 'The best way to learn physics!', userID: "user1" },
   3: { URL: 'https://www.freecodecamp.org/news/free-online-programming-cs-courses/', title: 'Software development tutorial', description: 'Well explain software development intro', userID: "user2" }
 };
+
 const users = {
   "user1": {
     id: "user1",
@@ -97,11 +109,11 @@ const categories = require("./routes/categories");
 // Note: Feel free to replace the example routes below with your own
 // app.use("/api/users", usersRoutes(db));
 // // Note: mount other resources here, using the same pattern above
-app.use("/homepage", homepageRoutes(db));
-app.use("/resource/:individualresource", individualResourceRoutes(db));
-app.use("/newresource", newResourceRoutes(db));
-app.use("/register", register(db));
-app.use("/category/:categoryID", categories(db));
+// app.use("/homepage", homepageRoutes(db));
+// app.use("/resource/:individualresource", individualResourceRoutes(db));
+// app.use("/newresource", newResourceRoutes(db));
+// app.use("/register", register(db));
+// app.use("/category/:categoryID", categories(db));
 
 // app.use("/", login(db))
 
@@ -142,12 +154,17 @@ const generateRandomString = function() {
 // get root directory - evenutally should be page of resources for guest users
 
 // AL added below:
-app.get('/', (req, res) => {
-  // if (!req.session.user_id) {
-  //   res.redirect('/login');
-  // }
-  const userObject = resourcesForUser(resourcesDatabase, 'user1'); // id hardcoded for now
-  const templateVars = { resources: userObject }; //, user: 'user1' }; // ?
+// app.get('/', (req, res) => {
+//   // if (!req.session.user_id) {
+//   //   res.redirect('/login');
+//   // }
+//   const userObject = resourcesForUser(resourcesDatabase, 'user1'); // id hardcoded for now
+//   const templateVars = { resources: userObject }; //, user: 'user1' }; // ?
+//   res.render('guestpage', templateVars);
+// });
+
+app.get('/', async function(req, res) {
+  const templateVars = { resources: await getResources() };
   res.render('guestpage', templateVars);
 });
 
