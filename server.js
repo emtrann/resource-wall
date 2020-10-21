@@ -9,12 +9,15 @@ const bodyParser = require("body-parser");
 const sass       = require("node-sass-middleware");
 const app        = express();
 const morgan     = require('morgan');
+// const databaseQueries = require('/queries')
+
 
 // AL added
 const bcrypt = require('bcrypt');
 const cookieSession = require('cookie-session');
 
 // PG database client/connection setup
+<<<<<<< HEAD
 const { Pool } = require('pg');
 const dbParams = require('./lib/db.js');
 const db = new Pool(dbParams);
@@ -22,6 +25,13 @@ const db = new Pool(dbParams);
 
 //testing db
 const pool = new Pool({
+=======
+const { Client } = require('pg');
+// const dbParams = require('./lib/db.js');
+// const db = new Pool(dbParams);
+
+const pool = new Client({
+>>>>>>> 5e1e05c752f4ec83ce7fc6d10d52a9f9dd813977
   user: 'vagrant',
   username: 'labber',
   password: '123',
@@ -30,6 +40,7 @@ const pool = new Pool({
 });
 pool.connect();
 
+<<<<<<< HEAD
 const getResources = function(options) {
   let queryString = `
   SELECT *
@@ -48,6 +59,30 @@ const getResources = function(options) {
 };
 
 console.log(getResources());
+=======
+
+
+const getResources = function() {
+  let queryString = `
+  SELECT *
+  FROM resources;`;
+
+  const query = {
+    text: queryString,
+    rowMode: 'array' }
+
+  return pool.query(query)
+  .then(res => (res.rows.map(row => ({
+    user: row[1],
+    category: row[2],
+    url: row[3],
+    title: row[4],
+    description: row[5]
+  }))))
+  .catch(err => console.error('query error', err.stack));
+};
+
+>>>>>>> 5e1e05c752f4ec83ce7fc6d10d52a9f9dd813977
 
 // Load the logger first so all (static) HTTP requests are logged to STDOUT
 // 'dev' = Concise output colored by response status for development use.
@@ -75,6 +110,7 @@ const resourcesDatabase = {
   2: { URL: 'https://www.khanacademy.org/science/high-school-physics', title: 'Physics 101', description: 'The best way to learn physics!', userID: "user1", category: "Science" },
   3: { URL: 'https://www.freecodecamp.org/news/free-online-programming-cs-courses/', title: 'Software development tutorial', description: 'Well explain software development intro', userID: "user2", category: "Software Development" }
 };
+
 const users = {
   "user1": {
     id: "user1",
@@ -102,13 +138,13 @@ const categories = require("./routes/categories");
 // NOT ACTUALLY SURE WHAT THIS DOES HERE -m
 // Mount all resource routes
 // Note: Feel free to replace the example routes below with your own
-app.use("/api/users", usersRoutes(db));
+// app.use("/api/users", usersRoutes(db));
 // // Note: mount other resources here, using the same pattern above
-app.use("/homepage", homepageRoutes(db));
-app.use("/resource/:individualresource", individualResourceRoutes(db));
-app.use("/newresource", newResourceRoutes(db));
-app.use("/register", register(db));
-app.use("/category/:categoryID", categories(db));
+// app.use("/homepage", homepageRoutes(db));
+// app.use("/resource/:individualresource", individualResourceRoutes(db));
+// app.use("/newresource", newResourceRoutes(db));
+// app.use("/register", register(db));
+// app.use("/category/:categoryID", categories(db));
 
 // app.use("/", login(db))
 
@@ -149,6 +185,7 @@ const generateRandomString = function() {
 // get root directory - evenutally should be page of resources for guest users
 
 // AL added below:
+<<<<<<< HEAD
 app.get('/', (req, res) => {
   // if (!req.session.user_id) {
   //   res.redirect('/login');
@@ -157,6 +194,19 @@ app.get('/', (req, res) => {
   // const resourcesObject = resourcesForUser(resourcesDatabase, 'user1'); // id hardcoded for now
   const resourcesObject = getResources();
   const templateVars = { resources: resourcesObject };
+=======
+// app.get('/', (req, res) => {
+//   // if (!req.session.user_id) {
+//   //   res.redirect('/login');
+//   // }
+//   const userObject = resourcesForUser(resourcesDatabase, 'user1'); // id hardcoded for now
+//   const templateVars = { resources: userObject }; //, user: 'user1' }; // ?
+//   res.render('guestpage', templateVars);
+// });
+
+app.get('/', async function(req, res) {
+  const templateVars = { resources: await getResources() };
+>>>>>>> 5e1e05c752f4ec83ce7fc6d10d52a9f9dd813977
   res.render('guestpage', templateVars);
 });
 

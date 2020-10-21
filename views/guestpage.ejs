@@ -63,6 +63,7 @@
             <th scope="col">Title</th>
             <th scope="col">URL</th>
             <th scope="col">Description</th>
+            <th scope="col">Added by</th>
 
           </tr>
         </thead>
@@ -70,9 +71,9 @@
           <% for(let resource in resources) { %>
             <tr class="table-row">
               <td><%= resources[resource].title %></td>
-              <td><%= resources[resource].URL %></td>
+              <td><%= resources[resource].url %></td>
               <td><%= resources[resource].description %></td>
-
+              <td><%= resources[resource].user %></td>
             </tr>
           <% } %>
         </tbody>
