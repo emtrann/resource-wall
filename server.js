@@ -2,13 +2,13 @@
 require('dotenv').config();
 
 // Web server config
-const PORT       = process.env.PORT || 8080;
-const ENV        = process.env.ENV || "development";
-const express    = require("express");
+const PORT = process.env.PORT || 8080;
+const ENV = process.env.ENV || "development";
+const express = require("express");
 const bodyParser = require("body-parser");
-const sass       = require("node-sass-middleware");
-const app        = express();
-const morgan     = require('morgan');
+const sass = require("node-sass-middleware");
+const app = express();
+const morgan = require('morgan');
 // const databaseQueries = require('/queries')
 
 
@@ -17,21 +17,11 @@ const bcrypt = require('bcrypt');
 const cookieSession = require('cookie-session');
 
 // PG database client/connection setup
-<<<<<<< HEAD
-const { Pool } = require('pg');
-const dbParams = require('./lib/db.js');
-const db = new Pool(dbParams);
-// db.connect();
-
-//testing db
-const pool = new Pool({
-=======
 const { Client } = require('pg');
 // const dbParams = require('./lib/db.js');
 // const db = new Pool(dbParams);
 
 const pool = new Client({
->>>>>>> 5e1e05c752f4ec83ce7fc6d10d52a9f9dd813977
   user: 'vagrant',
   username: 'labber',
   password: '123',
@@ -40,49 +30,97 @@ const pool = new Client({
 });
 pool.connect();
 
-<<<<<<< HEAD
-const getResources = function(options) {
-  let queryString = `
-  SELECT *
-  FROM resources;`;
-  const query = {
-    text: queryString,
-    rowMode: 'array' }
-  return pool.query(query)
-  .then(res => res.rows.map(row => ({
-    user: row[1],
-    url: row[3],
-    title: row[4],
-    description: row[5]
-  })))
-  .catch(err => console.error('query error', err.stack));
-};
 
-console.log(getResources());
-=======
-
-
-const getResources = function() {
+// Query function to database to get all resources
+const getResources = function () {
   let queryString = `
   SELECT *
   FROM resources;`;
 
   const query = {
     text: queryString,
-    rowMode: 'array' }
+    rowMode: 'array'
+  }
 
   return pool.query(query)
-  .then(res => (res.rows.map(row => ({
-    user: row[1],
-    category: row[2],
-    url: row[3],
-    title: row[4],
-    description: row[5]
-  }))))
-  .catch(err => console.error('query error', err.stack));
+    .then(res => (res.rows.map(row => ({
+      user: row[1],
+      category: row[2],
+      url: row[3],
+      title: row[4],
+      description: row[5]
+    }))))
+    .catch(err => console.error('query error', err.stack));
 };
 
->>>>>>> 5e1e05c752f4ec83ce7fc6d10d52a9f9dd813977
+// Query function to get resources for one user
+const getResourcesForUser = function(email) {
+  let queryString = `
+  SELECT *
+  FROM resources
+  JOIN users ON user_id = users.id
+  WHERE email = $1;`;
+
+  const query = {
+    text: queryString,
+    rowMode: 'array'
+  }
+
+  return pool.query(query, [email])
+    .then(res => (res.rows.map(row => ({
+      name: row[7],
+      category: row[2],
+      url: row[3],
+      title: row[4],
+      description: row[5]
+    }))))
+    .catch(err => console.error('query error', err.stack));
+};
+
+const asyncResources = async function() {
+  console.log(await getResourcesForUser('tristanjacobs@gmail.com'));
+}
+
+asyncResources()
+
+
+
+// Query function - add new user to db
+const addNewUser = function (user) {
+  return pool.query(`
+    INSERT INTO users (name, email, password)
+    VALUES ($1, $2, $3)
+    RETURNING *;`,
+      [user.name, user.email, user.password])
+    .then(res => res.rows[0])
+    .catch(err => console.error('query error', err.stack));
+
+}
+
+// Query function - sorts through db to find if user email exists
+const findUserByEmail = function(email) {
+  return pool.query(`
+  SELECT email
+  FROM users
+  WHERE email = $1;
+  `, [email])
+  .then(res => res.rows[0]);
+}
+
+// const asyncEmail = async function() {
+//   console.log(await findUserByEmail('12312@gmail.com'));
+// }
+
+// Query function - finds user and password in db
+const findUserCredentials = function(email) {
+  return pool.query(`
+  SELECT email, password
+  FROM users
+  WHERE email = $1;
+  `, [email])
+  .then(res => res.rows[0]);
+}
+
 
 // Load the logger first so all (static) HTTP requests are logged to STDOUT
 // 'dev' = Concise output colored by response status for development use.
@@ -106,9 +144,9 @@ app.use(cookieSession({
 }));
 // Temporary Data to be replaced by Database:
 const resourcesDatabase = {
-  1: { URL: 'https://business.tutsplus.com/tutorials/how-to-start-a-business--cms-25638', title: 'Awesome business tutorial!', description: 'All you need to know to start yout own company', userID: "user1", category: "Business" },
-  2: { URL: 'https://www.khanacademy.org/science/high-school-physics', title: 'Physics 101', description: 'The best way to learn physics!', userID: "user1", category: "Science" },
-  3: { URL: 'https://www.freecodecamp.org/news/free-online-programming-cs-courses/', title: 'Software development tutorial', description: 'Well explain software development intro', userID: "user2", category: "Software Development" }
+  1: { URL: 'https://business.tutsplus.com/tutorials/how-to-start-a-business--cms-25638', title: 'Awesome business tutorial!', description: 'All you need to know to start yout own company', userID: "user1" },
+  2: { URL: 'https://www.khanacademy.org/science/high-school-physics', title: 'Physics 101', description: 'The best way to learn physics!', userID: "user1" },
+  3: { URL: 'https://www.freecodecamp.org/news/free-online-programming-cs-courses/', title: 'Software development tutorial', description: 'Well explain software development intro', userID: "user2" }
 };
 
 const users = {
@@ -150,20 +188,20 @@ const categories = require("./routes/categories");
 
 // UP UNTIL HERE
 
-const findUserByEmail = (usersDb, email) => {
-  for (let user in usersDb) {
-    const userObj = usersDb[user];
-    if (userObj['email'] === email) {
-      console.log(userObj['email'])
-      return userObj;
-    }
-  }
-  return false;
-};
+// const findUserByEmail = (usersDb, email) => {
+//   for (let user in usersDb) {
+//     const userObj = usersDb[user];
+//     if (userObj['email'] === email) {
+//       console.log(userObj['email'])
+//       return userObj;
+//     }
+//   }
+//   return false;
+// };
 
 // AL added below:
 // returns an object containing all resouces for a given userID:
-const resourcesForUser = function(database, id) {
+const resourcesForUser = function (database, id) {
   const filteredResources = {};
   for (let resourceId in database) {
     const resourceObj = database[resourceId];
@@ -173,10 +211,6 @@ const resourcesForUser = function(database, id) {
   }
   return filteredResources;
 };
-// random string for user ID:
-const generateRandomString = function() {
-  return Math.random().toString(16).slice(2, 7);
-};
 
 // Home page
 // Warning: avoid creating more routes in this file!
@@ -185,39 +219,24 @@ const generateRandomString = function() {
 // get root directory - evenutally should be page of resources for guest users
 
 // AL added below:
-<<<<<<< HEAD
-app.get('/', (req, res) => {
-  // if (!req.session.user_id) {
-  //   res.redirect('/login');
-  // }
-
-  // const resourcesObject = resourcesForUser(resourcesDatabase, 'user1'); // id hardcoded for now
-  const resourcesObject = getResources();
-  const templateVars = { resources: resourcesObject };
-=======
 // app.get('/', (req, res) => {
-//   // if (!req.session.user_id) {
-//   //   res.redirect('/login');
-//   // }
 //   const userObject = resourcesForUser(resourcesDatabase, 'user1'); // id hardcoded for now
 //   const templateVars = { resources: userObject }; //, user: 'user1' }; // ?
 //   res.render('guestpage', templateVars);
 // });
 
-app.get('/', async function(req, res) {
+app.get('/', async function (req, res) {
   const templateVars = { resources: await getResources() };
->>>>>>> 5e1e05c752f4ec83ce7fc6d10d52a9f9dd813977
   res.render('guestpage', templateVars);
 });
 
 // homepage for users - redirect here after login + shows liked & saved resources
 // AL added below:
-app.get("/homepage", (req, res) => {
+app.get("/homepage", async function(req, res) {
   if (!req.session.user_id) {
     res.redirect('/register');
   }
-  const userObject = resourcesForUser(resourcesDatabase, req.session.user_id);
-  const templateVars = { resources: userObject, user: users[req.session.user_id] };
+  const templateVars = { resources: await getResourcesForUser() };
   res.render("homepage", templateVars);
 })
 
@@ -253,40 +272,47 @@ app.post("/newresource", (req, res) => {
   //redirect to my my resources
 })
 
-app.post("/register", (req, res) => {
-  const newUserId = generateRandomString();
+app.post("/register", async function(req, res) {
+  const name = req.body.username;
   const email = req.body.email;
-  const password = req.body.password;
-  const hashedPassword = bcrypt.hashSync(password, 10);
+  const prehashPassword = req.body.password;
+  const password = bcrypt.hashSync(prehashPassword, 10);
   if (email === '' || password === '') {
-    res.status(400).json({message: 'Please enter email and password'}); // change to slide down message
+    res.status(400).json({ message: 'Please enter email and password' }); // change to slide down message
   }
-  for (let user in users) {
-    if (email === users[user].email) {
-      res.status(400).json({message: 'Email already exists'});
-    }
+  if (await findUserByEmail(email) !== undefined) {
+    console.log(await findUserByEmail(email))
+    res.status(400).json({ message: 'This email already exists' });
+  } else {
+    addNewUser({
+      name,
+      email,
+      password
+    })
+    req.session.user_id = email;
+    const templateVars = { resources: await getResourcesForUser(), user: req.session.user_id };
+  res.render("homepage", templateVars);
+    // res.redirect('/homepage');
   }
-  users[newUserId] = { id: newUserId, email: email, password: hashedPassword };
-  req.session.user_id = newUserId;
-  res.redirect('/homepage');
 })
 
-//login
-app.post("/", (req, res) => {
+//login - change username to email **, error to pop up for incorrect password
+app.post("/", async function(req, res) {
   const { username, psw } = req.body;
-  let user = findUserByEmail(users, username);
+  let user = await findUserCredentials(username);
   console.log(req.body);
   console.log(user)
 
   if (!user) {
-    res.status(403).json({message: "Email cannot be found"});
+    res.status(403).json({ message: "Email cannot be found" });
   } else if (user) {
-    bcrypt.compare(psw, user['password'], function(err, isPasswordMatched) {
+    bcrypt.compare(psw, user['password'], function (err, isPasswordMatched) {
       if (isPasswordMatched) {
-        req.session.user_id = `${user["email"]}`;
-        res.redirect("/");
+        req.session.user_id = username;
+
+        res.redirect("/homepage");
       } else {
-        res.render("register", { error: "Incorrect Password", user: user});
+        res.render("register", { error: "Incorrect Password", user: user });
       }
     });
   }
