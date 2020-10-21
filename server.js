@@ -18,7 +18,36 @@ const cookieSession = require('cookie-session');
 const { Pool } = require('pg');
 const dbParams = require('./lib/db.js');
 const db = new Pool(dbParams);
-db.connect();
+// db.connect();
+
+//testing db
+const pool = new Pool({
+  user: 'vagrant',
+  username: 'labber',
+  password: '123',
+  host: 'localhost',
+  database: 'midterm'
+});
+pool.connect();
+
+const getResources = function(options) {
+  let queryString = `
+  SELECT *
+  FROM resources;`;
+  const query = {
+    text: queryString,
+    rowMode: 'array' }
+  return pool.query(query)
+  .then(res => console.log(res.rows.map(row => ({
+    user: row[1],
+    url: row[3],
+    title: row[4],
+    description: row[5]
+  }))))
+  .catch(err => console.error('query error', err.stack));
+};
+
+getResources();
 
 // Load the logger first so all (static) HTTP requests are logged to STDOUT
 // 'dev' = Concise output colored by response status for development use.
@@ -124,8 +153,10 @@ app.get('/', (req, res) => {
   // if (!req.session.user_id) {
   //   res.redirect('/login');
   // }
-  const userObject = resourcesForUser(resourcesDatabase, 'user1'); // id hardcoded for now
-  const templateVars = { resources: userObject };
+
+  // const resourcesObject = resourcesForUser(resourcesDatabase, 'user1'); // id hardcoded for now
+  const resourcesObject = getResources();
+  const templateVars = { resources: resourcesObject };
   res.render('guestpage', templateVars);
 });
 
