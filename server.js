@@ -38,16 +38,16 @@ const getResources = function(options) {
     text: queryString,
     rowMode: 'array' }
   return pool.query(query)
-  .then(res => console.log(res.rows.map(row => ({
+  .then(res => res.rows.map(row => ({
     user: row[1],
     url: row[3],
     title: row[4],
     description: row[5]
-  }))))
+  })))
   .catch(err => console.error('query error', err.stack));
 };
 
-getResources();
+console.log(getResources());
 
 // Load the logger first so all (static) HTTP requests are logged to STDOUT
 // 'dev' = Concise output colored by response status for development use.
