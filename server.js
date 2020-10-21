@@ -292,7 +292,7 @@ app.post("/register", async function(req, res) {
     req.session.user_id = email;
     const templateVars = { resources: await getResourcesForUser(), user: req.session.user_id };
   res.render("homepage", templateVars);
-    // res.redirect('/homepage');
+    // res.redirect('homepage');
   }
 })
 
@@ -309,7 +309,6 @@ app.post("/", async function(req, res) {
     bcrypt.compare(psw, user['password'], function (err, isPasswordMatched) {
       if (isPasswordMatched) {
         req.session.user_id = username;
-
         res.redirect("/homepage");
       } else {
         res.render("register", { error: "Incorrect Password", user: user });
