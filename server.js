@@ -77,11 +77,28 @@ const getResourcesForUser = function(email) {
     .catch(err => console.error('query error', err.stack));
 };
 
-const asyncResources = async function() {
-  console.log(await getResourcesForUser('tristanjacobs@gmail.com'));
-}
+const getResourcesByCategory = function(category) {
+  let queryString = `
+  SELECT *
+  FROM resources
+  JOIN users ON user_id = users.id
+  WHERE category_id = $1;`;
 
-asyncResources()
+  const query = {
+    text: queryString,
+    rowMode: 'array'
+  }
+
+  return pool.query(query, [category])
+  .then(res => (res.rows.map(row => ({
+    name: row[7],
+    category: row[2],
+    url: row[3],
+    title: row[4],
+    description: row[5]
+  }))))
+  .catch(err => console.error('query error', err.stack));
+}
 
 //-------- NEW
 // Query function - add new resource to db
@@ -178,25 +195,6 @@ app.use(cookieSession({
   name: 'session',
   keys: ['asdf', 'lkjhg']
 }));
-// Temporary Data to be replaced by Database:
-const resourcesDatabase = {
-  1: { URL: 'https://business.tutsplus.com/tutorials/how-to-start-a-business--cms-25638', title: 'Awesome business tutorial!', description: 'All you need to know to start yout own company', userID: "user1" },
-  2: { URL: 'https://www.khanacademy.org/science/high-school-physics', title: 'Physics 101', description: 'The best way to learn physics!', userID: "user1" },
-  3: { URL: 'https://www.freecodecamp.org/news/free-online-programming-cs-courses/', title: 'Software development tutorial', description: 'Well explain software development intro', userID: "user2" }
-};
-
-const users = {
-  "user1": {
-    id: "user1",
-    email: "user1@example.com",
-    password: bcrypt.hashSync("password", 10)
-  },
-  "user2": {
-    id: "user2",
-    email: "user2@example.com",
-    password: bcrypt.hashSync("password", 10)
-  }
-};
 
 // Separated Routes for each Resource
 // Note: Feel free to replace the example routes below with your own
@@ -209,20 +207,6 @@ const categories = require("./routes/categories");
 // const login = require("./routes/login-route.js");
 
 
-// NOT ACTUALLY SURE WHAT THIS DOES HERE -m
-// Mount all resource routes
-// Note: Feel free to replace the example routes below with your own
-// app.use("/api/users", usersRoutes(db));
-// // Note: mount other resources here, using the same pattern above
-// app.use("/homepage", homepageRoutes(db));
-// app.use("/resource/:individualresource", individualResourceRoutes(db));
-// app.use("/newresource", newResourceRoutes(db));
-// app.use("/register", register(db));
-// app.use("/category/:categoryID", categories(db));
-
-// app.use("/", login(db))
-
-// UP UNTIL HERE
 
 // Home page
 // Warning: avoid creating more routes in this file!
@@ -254,8 +238,11 @@ app.get("/newresource", (req, res) => {
 })
 
 // route for individual categories
-app.get("/category/:categoryID", (req, res) => {
-  res.render("categories")
+app.get("/category/:categoryID", async function(req, res) {
+  const templateVars = {
+    resources: await getResourcesByCategory(req.params.categoryID)
+  }
+  res.render("categories", templateVars);
 })
 
 // route to register

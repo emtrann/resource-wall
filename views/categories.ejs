@@ -12,6 +12,27 @@
   </head>
 
   <body>
-    <h1>This should show resources under individual categories</h1>
+    <div class="main">
+      <img class="book" src="/images/myresources.png">
+      <div class="feature">
+        <table class="table">
+          <thead>
+            <tr class="table-head">
+              <th scope="col">Title</th>
+              <th scope="col">URL</th>
+              <th scope="col">Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% for(let resource in resources) { %>
+            <tr class="table-row">
+              <td><%= resources[resource].title %></td>
+              <td><%= resources[resource].url %></td>
+              <td><%= resources[resource].description %></td>
+            </tr>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
   </body>
 </html>
