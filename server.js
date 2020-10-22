@@ -139,18 +139,15 @@ const addNewResource = function (resource) {
   .then(res => res.rows)
   .catch(err => console.error('query error', err.stack));
 };
-const getUserId = function () {
+const getUserId = function (email) {
   return pool.query( `
   SELECT id
   FROM users
-  WHERE email = 'tristanjacobs@gmail.com'
-  `)
+  WHERE email = $1;
+  `, [email])
   .then(res => res.rows[0].id)
 };
-const asyncUserId = async function() {
-  console.log('user ID: ', await getUserId());
-}
-asyncUserId();
+
 // Query function - add new user to db
 const addNewUser = function (user) {
   return pool.query(`
@@ -197,6 +194,55 @@ const findUserCredentials = function(email) {
   `, [email])
   .then(res => res.rows[0]);
 }
+
+// Query function - adds new comment to db
+const addComment = function(commentObj) {
+  return pool.query(`
+  INSERT INTO comments (resource_id, message, date)
+  VALUES ($1, $2, $3);`, [commentObj.resourceId, commentObj.message, 'NOW()'])
+  .then(res => res.rows)
+  .catch(err => console.error('query error', err.stack));
+}
+
+// helper function - find resource ID with title name
+const findResourceIdByTitle = function(title) {
+  return pool.query(`
+  SELECT id
+  FROM resources
+  WHERE title LIKE $1;
+  `, [`%${title}%`])
+  .then(res => res.rows[0]);
+}
+
+// returns all comment messages and dates from db
+const getAllComments = function(individualResource) {
+  const queryString = `
+  SELECT message, date
+  FROM comments
+  WHERE resource_id = $1;
+  `
+
+  const query = {
+    text: queryString,
+    rowMode: 'array'
+  }
+
+  return pool.query(query, [individualResource])
+  .then(res => (res.rows.map(row => ({
+    message: row[0],
+    date: row[1],
+  }))))
+}
+
+const asyncComments = async function() {
+  let allComments = await getAllComments(2)
+  console.log(allComments);
+  console.log(allComments[0].message)
+}
+
+asyncComments();
+
+
 // Load the logger first so all (static) HTTP requests are logged to STDOUT
 // 'dev' = Concise output colored by response status for development use.
 //         The :status token will be colored red for server error codes, yellow for client error codes, cyan for redirection codes, and uncolored for all other codes.
@@ -264,10 +310,13 @@ app.get("/register", (req, res) => {
 });
 // route for individual resources
 app.get("/resource/:individualresource", async function(req, res) {
-  console.log(req.params.individualresource);
+  console.log('this is inside get', req.params.individualresource);
   let newTitle = req.params.individualresource.split('+').join(' ');
+  let idForResource = await findResourceIdByTitle(newTitle)
+
   const templateVars = {
-    resources: await getIndividualResource(newTitle)
+    resources: await getIndividualResource(newTitle),
+    comments: await getAllComments(idForResource['id'])
   }
   res.render("individualResource", templateVars)
 })
@@ -298,8 +347,23 @@ app.post("/search/:searchQuery", function(req, res) {
   searchQueryUrl = req.body.searchResult;
   res.redirect(`/search/${searchQueryUrl}`)
 })
+
+app.post("/resource/:individualresource", async function(req, res) {
+  console.log('look at me', req.body.cmt)
+  let resParam = req.params.individualresource
+  const urlString = req.headers.referer.split('/');
+  resParam = urlString[urlString.length-1].split('+').join(' ');
+  let resourceVar = await findResourceIdByTitle(resParam);
+  addComment({
+    message: req.body.cmt,
+    resourceId: resourceVar['id']
+  })
+  console.log(req.body)
+  res.redirect('back');
+})
+
 app.post("/newresource", async function(req, res) {
-  const userId = 1; //req.session.userId;//await getUserId(); // gets value from db through query function
+  const userId = await getUserId(req.session.user_id)
   const title = req.body.title;
   const description = req.body.description;
   const url = req.body.url;
