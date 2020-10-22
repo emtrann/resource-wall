@@ -77,6 +77,7 @@ const getResourcesForUser = function(email) {
     .catch(err => console.error('query error', err.stack));
 };
 
+// Sorts out db resources and displays them by category
 const getResourcesByCategory = function(category) {
   let queryString = `
   SELECT *
@@ -99,6 +100,36 @@ const getResourcesByCategory = function(category) {
   }))))
   .catch(err => console.error('query error', err.stack));
 }
+
+const getIndividualResource = function(resourceTitle) {
+  let queryString = `
+  SELECT *
+  FROM resources
+  JOIN users ON user_id = users.id
+  WHERE title LIKE $1;
+  `;
+
+  const query = {
+    text: queryString,
+    rowMode: 'array'
+  }
+
+  return pool.query(query, [`%${resourceTitle}%`])
+  .then(res => (res.rows.map(row => ({
+    name: row[7],
+    category: row[2],
+    url: row[3],
+    title: row[4],
+    description: row[5]
+  }))))
+  .catch(err => console.error('query error', err.stack));
+}
+
+const asyncIndividualResource = async function() {
+  console.log(await getIndividualResource('Awesome business tutorial'))
+}
+
+asyncIndividualResource();
 
 
 // Query function - add new user to db
@@ -191,6 +222,7 @@ const individualResourceRoutes = require("./routes/individualResource");
 const newResourceRoutes = require("./routes/newResource");
 const register = require("./routes/register");
 const categories = require("./routes/categories");
+const { request } = require('express');
 // const login = require("./routes/login-route.js");
 
 
@@ -241,8 +273,13 @@ app.get("/register", (req, res) => {
 
 
 // route for individual resources
-app.get("/resource/:individualresource", (req, res) => {
-  res.render("individualResource")
+app.get("/resource/:individualresource", async function(req, res) {
+  console.log(req.params.individualresource);
+  let newTitle = req.params.individualresource.split('+').join(' ');
+  const templateVars = {
+    resources: await getIndividualResource(newTitle)
+  }
+  res.render("individualResource", templateVars)
 })
 
 
