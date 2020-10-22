@@ -77,11 +77,11 @@ const getResourcesForUser = function(email) {
     .catch(err => console.error('query error', err.stack));
 };
 
-const asyncResources = async function() {
-  console.log(await getResourcesForUser('tristanjacobs@gmail.com'));
-}
+// const asyncResources = async function() {
+//   console.log(await getResourcesForUser('tristanjacobs@gmail.com'));
+// }
 
-asyncResources()
+// asyncResources()
 
 
 
@@ -103,18 +103,30 @@ const addNewResource = function (resource) {
   VALUES ($1, $2, $3, $4, $5)
   RETURNING *;
   `, [resource.userId, resource.category, resource.url, resource.title, resource.description])
-  .then(res => res.rows[0])
+  .then(res => res.rows)
   .catch(err => console.error('query error', err.stack));
+};
+
+const asyncEmail = async function() {
+  console.log(await addNewResource({
+
+  }));
 }
+
 const getUserId = function () {
   return pool.query( `
   SELECT id
   FROM users
   WHERE email = 'tristanjacobs@gmail.com'
   `)
-}
+  .then(res => res.rows[0].id)
+};
 
-console.log(getUserId());
+const asyncUserId = async function() {
+  console.log('user ID: ', await getUserId());
+}
+asyncUserId();
+
 // Query function - sorts through db to find if user email exists
 const findUserByEmail = function(email) {
   return pool.query(`
@@ -254,7 +266,7 @@ app.get("/homepage", async function(req, res) {
   // if (!req.session.user_id) {
   //   res.redirect('/register');
   // }
-  const templateVars = { resources: await getResourcesForUser() };
+  const templateVars = { resources: await getResourcesForUser(), user: req.session.user_id };
   res.render("homepage", templateVars);
 })
 
@@ -284,20 +296,20 @@ app.get("/resource/:individualresource", (req, res) => {
 
 // POST routes
 
-app.post("/newresource", (req, res) => {
-  const userId = 1; // this should come from the db through query function
+app.post("/newresource", async function(req, res) {
+  const userId = req.session.userId;//await getUserId(); // gets value from db through query function
   const title = req.body.title;
   const description = req.body.description;
   const url = req.body.url;
   const category = 4; //req.body.category; // this should be just a number, unless we change db to accept names
-  addNewResource({
+  let newResource = {
     userId,
     category,
     url,
     title,
     description
-  });
-
+  };
+  addNewResource(newResource);
   res.redirect('/homepage');
 })
 
