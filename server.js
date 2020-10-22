@@ -1,6 +1,5 @@
 // load .env data into process.env
 require('dotenv').config();
-
 // Web server config
 const PORT = process.env.PORT || 8080;
 const ENV = process.env.ENV || "development";
@@ -10,17 +9,13 @@ const sass = require("node-sass-middleware");
 const app = express();
 const morgan = require('morgan');
 // const databaseQueries = require('/queries')
-
-
 // AL added
 const bcrypt = require('bcrypt');
 const cookieSession = require('cookie-session');
-
 // PG database client/connection setup
 const { Client } = require('pg');
 // const dbParams = require('./lib/db.js');
 // const db = new Pool(dbParams);
-
 const pool = new Client({
   user: 'vagrant',
   username: 'labber',
@@ -29,19 +24,15 @@ const pool = new Client({
   database: 'midterm'
 });
 pool.connect();
-
-
 // Query function to database to get all resources
 const getResources = function () {
   let queryString = `
   SELECT *
   FROM resources;`;
-
   const query = {
     text: queryString,
     rowMode: 'array'
   }
-
   return pool.query(query)
     .then(res => (res.rows.map(row => ({
       user: row[1],
@@ -52,7 +43,6 @@ const getResources = function () {
     }))))
     .catch(err => console.error('query error', err.stack));
 };
-
 // Query function to get resources for one user
 const getResourcesForUser = function(email) {
   let queryString = `
@@ -60,12 +50,10 @@ const getResourcesForUser = function(email) {
   FROM resources
   JOIN users ON user_id = users.id
   WHERE email = $1;`;
-
   const query = {
     text: queryString,
     rowMode: 'array'
   }
-
   return pool.query(query, [email])
     .then(res => (res.rows.map(row => ({
       name: row[7],
@@ -76,26 +64,16 @@ const getResourcesForUser = function(email) {
     }))))
     .catch(err => console.error('query error', err.stack));
 };
-
-<<<<<<< HEAD
-// const asyncResources = async function() {
-//   console.log(await getResourcesForUser('tristanjacobs@gmail.com'));
-// }
-
-// asyncResources()
-=======
 const getResourcesByCategory = function(category) {
   let queryString = `
   SELECT *
   FROM resources
   JOIN users ON user_id = users.id
   WHERE category_id = $1;`;
-
   const query = {
     text: queryString,
     rowMode: 'array'
   }
-
   return pool.query(query, [category])
   .then(res => (res.rows.map(row => ({
     name: row[7],
@@ -106,46 +84,6 @@ const getResourcesByCategory = function(category) {
   }))))
   .catch(err => console.error('query error', err.stack));
 }
->>>>>>> category-routes
-
-//-------- NEW
-// Query function - add new resource to db
-const addNewResource = function (resource) {
-  return pool.query(`
-  INSERT INTO resources (user_id, category_id, url, title, description)
-  VALUES ($1, $2, $3, $4, $5)
-  RETURNING *;
-  `, [resource.userId, resource.category, resource.url, resource.title, resource.description])
-  .then(res => res.rows[0])
-  .catch(err => console.error('query error', err.stack));
-}
-
-const getUserId = function () {
-  return pool.query( `
-  SELECT id
-  FROM users
-  WHERE email = 'tristanjacobs@gmail.com'
-  `)
-}
-
-app.post("/newresource", (req, res) => {
-  const userId = 1; // this should come from the db through query function
-  const title = req.body.title;
-  const description = req.body.description;
-  const url = req.body.url;
-  const category = 4; //req.body.category; // this should be just a number, unless we change db to accept names
-  addNewResource({
-    userId,
-    category,
-    url,
-    title,
-    description
-  });
-
-  res.redirect('/homepage');
-})
-// ----------------
-
 // Query function - add new user to db
 const addNewUser = function (user) {
   return pool.query(`
@@ -156,7 +94,6 @@ const addNewUser = function (user) {
     .then(res => res.rows[0])
     .catch(err => console.error('query error', err.stack));
 }
-
 // Query function - add new resource to db
 const addNewResource = function (resource) {
   return pool.query(`
@@ -167,13 +104,6 @@ const addNewResource = function (resource) {
   .then(res => res.rows)
   .catch(err => console.error('query error', err.stack));
 };
-
-const asyncEmail = async function() {
-  console.log(await addNewResource({
-
-  }));
-}
-
 const getUserId = function () {
   return pool.query( `
   SELECT id
@@ -182,12 +112,10 @@ const getUserId = function () {
   `)
   .then(res => res.rows[0].id)
 };
-
 const asyncUserId = async function() {
   console.log('user ID: ', await getUserId());
 }
 asyncUserId();
-
 // Query function - sorts through db to find if user email exists
 const findUserByEmail = function(email) {
   return pool.query(`
@@ -197,11 +125,9 @@ const findUserByEmail = function(email) {
   `, [email])
   .then(res => res.rows[0]);
 }
-
 // const asyncEmail = async function() {
 //   console.log(await findUserByEmail('12312@gmail.com'));
 // }
-
 // Query function - finds user and password in db
 const findUserCredentials = function(email) {
   return pool.query(`
@@ -211,13 +137,10 @@ const findUserCredentials = function(email) {
   `, [email])
   .then(res => res.rows[0]);
 }
-
-
 // Load the logger first so all (static) HTTP requests are logged to STDOUT
 // 'dev' = Concise output colored by response status for development use.
 //         The :status token will be colored red for server error codes, yellow for client error codes, cyan for redirection codes, and uncolored for all other codes.
 app.use(morgan('dev'));
-
 app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use("/styles", sass({
@@ -227,13 +150,11 @@ app.use("/styles", sass({
   outputStyle: 'expanded'
 }));
 app.use(express.static("public"));
-
 // AL added below
 app.use(cookieSession({
   name: 'session',
   keys: ['asdf', 'lkjhg']
 }));
-
 // Separated Routes for each Resource
 // Note: Feel free to replace the example routes below with your own
 const usersRoutes = require("./routes/users");
@@ -243,45 +164,30 @@ const newResourceRoutes = require("./routes/newResource");
 const register = require("./routes/register");
 const categories = require("./routes/categories");
 // const login = require("./routes/login-route.js");
-
-
-
 // Home page
 // Warning: avoid creating more routes in this file!
 // Separate them into separate routes files (see above).
-
 // get root directory - evenutally should be page of resources for guest users
-
 // AL added below:
 app.get('/', async function (req, res) {
   const templateVars = { resources: await getResources() };
   res.render('guestpage', templateVars);
 });
-
 // homepage for users - redirect here after login + shows liked & saved resources
 // AL added below:
 app.get("/homepage", async function(req, res) {
-<<<<<<< HEAD
-  // if (!req.session.user_id) {
-  //   res.redirect('/register');
-  // }
-  const templateVars = { resources: await getResourcesForUser(), user: req.session.user_id };
-=======
   if (!req.session.user_id) {
     res.redirect('/register');
   }
   const templateVars = {
     user: req.session.user_id,
     resources: await getResourcesForUser(req.session.user_id) };
->>>>>>> 417371a02f24dbbc94a3302a3f3d0a808cad00b1
   res.render("homepage", templateVars);
 })
-
 // route to make a new resource
 app.get("/newresource", (req, res) => {
   res.render("newResource")
 })
-
 // route for individual categories
 app.get("/category/:categoryID", async function(req, res) {
   const templateVars = {
@@ -289,24 +195,17 @@ app.get("/category/:categoryID", async function(req, res) {
   }
   res.render("categories", templateVars);
 })
-
 // route to register
 // AL added below:
 app.get("/register", (req, res) => {
-  const templateVars = { user: users[req.session.user_id] };
+  const templateVars = { user: req.session.user_id };
   res.render("register", templateVars);
 });
-
-
 // route for individual resources
 app.get("/resource/:individualresource", (req, res) => {
   res.render("individualResource")
 })
-
-
 // POST routes
-
-<<<<<<< HEAD
 app.post("/newresource", async function(req, res) {
   const userId = req.session.userId;//await getUserId(); // gets value from db through query function
   const title = req.body.title;
@@ -323,14 +222,6 @@ app.post("/newresource", async function(req, res) {
   addNewResource(newResource);
   res.redirect('/homepage');
 })
-=======
-// app.post("/newresource", (req, res) => {
-//   // let title = form input title
-//   // take in req information and push it to database
-//   //redirect to my my resources
-// })
->>>>>>> 417371a02f24dbbc94a3302a3f3d0a808cad00b1
-
 app.post("/register", async function(req, res) {
   const name = req.body.username;
   const email = req.body.email;
@@ -347,23 +238,19 @@ app.post("/register", async function(req, res) {
       name,
       email,
       password
-
     })
     req.session.user_id = email;
     const templateVars = { resources: await getResourcesForUser(), user: req.session.user_id };
   res.render("homepage", templateVars);
-
     // res.redirect('homepage');
   }
 })
-
 //login - change username to email **, error to pop up for incorrect password
 app.post("/", async function(req, res) {
   const { username, psw } = req.body;
   let user = await findUserCredentials(username);
   console.log(req.body);
   console.log(user)
-
   if (!user) {
     res.status(403).json({ message: "Email cannot be found" });
   } else if (user) {
@@ -379,13 +266,10 @@ app.post("/", async function(req, res) {
     });
   }
 });
-
 app.post("/logout", (req, res) => {
   req.session = null;
   res.redirect("/");
 })
-
-
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}`);
 });
