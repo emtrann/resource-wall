@@ -33,7 +33,9 @@
       </form>
       <% } %>
       <div class="new-resource">
+        <a href="/newresource">
         <button type="submit" class="btn btn-primary">Make New Resource</button>
+      </a>
       </div>
       <div class="categories">
         <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Categories
@@ -83,9 +85,20 @@
     <div class="my-likes">
     <table class="liked-content">
       <thead>
+        <tr class ="likes-head"></tr>
         <th scope="col">Title</th>
         <th scope="col">Description</th>
+      </tr>
       </thead>
+      <tbody>
+        <% for(let resource in resources) { %>
+          <tr class="like-row">
+            <td><%= resources[resource].title %></td>
+
+            <td><%= resources[resource].user %></td>
+          </tr>
+        <% } %>
+      </tbody>
     </table>
   </div>
   </body>
