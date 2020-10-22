@@ -83,7 +83,43 @@ const asyncResources = async function() {
 
 asyncResources()
 
+//-------- NEW
+// Query function - add new resource to db
+const addNewResource = function (resource) {
+  return pool.query(`
+  INSERT INTO resources (user_id, category_id, url, title, description)
+  VALUES ($1, $2, $3, $4, $5)
+  RETURNING *;
+  `, [resource.userId, resource.category, resource.url, resource.title, resource.description])
+  .then(res => res.rows[0])
+  .catch(err => console.error('query error', err.stack));
+}
 
+const getUserId = function () {
+  return pool.query( `
+  SELECT id
+  FROM users
+  WHERE email = 'tristanjacobs@gmail.com'
+  `)
+}
+
+app.post("/newresource", (req, res) => {
+  const userId = 1; // this should come from the db through query function
+  const title = req.body.title;
+  const description = req.body.description;
+  const url = req.body.url;
+  const category = 4; //req.body.category; // this should be just a number, unless we change db to accept names
+  addNewResource({
+    userId,
+    category,
+    url,
+    title,
+    description
+  });
+
+  res.redirect('/homepage');
+})
+// ----------------
 
 // Query function - add new user to db
 const addNewUser = function (user) {
@@ -236,7 +272,9 @@ app.get("/homepage", async function(req, res) {
   if (!req.session.user_id) {
     res.redirect('/register');
   }
-  const templateVars = { resources: await getResourcesForUser() };
+  const templateVars = {
+    user: req.session.user_id,
+    resources: await getResourcesForUser(req.session.user_id) };
   res.render("homepage", templateVars);
 })
 
@@ -266,11 +304,11 @@ app.get("/resource/:individualresource", (req, res) => {
 
 // POST routes
 
-app.post("/newresource", (req, res) => {
-  // let title = form input title
-  // take in req information and push it to database
-  //redirect to my my resources
-})
+// app.post("/newresource", (req, res) => {
+//   // let title = form input title
+//   // take in req information and push it to database
+//   //redirect to my my resources
+// })
 
 app.post("/register", async function(req, res) {
   const name = req.body.username;
