@@ -77,11 +77,11 @@ const getResourcesForUser = function(email) {
     .catch(err => console.error('query error', err.stack));
 };
 
-const asyncResources = async function() {
-  console.log(await getResourcesForUser('tristanjacobs@gmail.com'));
-}
+// const asyncResources = async function() {
+//   console.log(await getResourcesForUser('tristanjacobs@gmail.com'));
+// }
 
-asyncResources()
+// asyncResources()
 
 
 
@@ -94,8 +94,38 @@ const addNewUser = function (user) {
       [user.name, user.email, user.password])
     .then(res => res.rows[0])
     .catch(err => console.error('query error', err.stack));
-
 }
+
+// Query function - add new resource to db
+const addNewResource = function (resource) {
+  return pool.query(`
+  INSERT INTO resources (user_id, category_id, url, title, description)
+  VALUES ($1, $2, $3, $4, $5)
+  RETURNING *;
+  `, [resource.userId, resource.category, resource.url, resource.title, resource.description])
+  .then(res => res.rows)
+  .catch(err => console.error('query error', err.stack));
+};
+
+const asyncEmail = async function() {
+  console.log(await addNewResource({
+
+  }));
+}
+
+const getUserId = function () {
+  return pool.query( `
+  SELECT id
+  FROM users
+  WHERE email = 'tristanjacobs@gmail.com'
+  `)
+  .then(res => res.rows[0].id)
+};
+
+const asyncUserId = async function() {
+  console.log('user ID: ', await getUserId());
+}
+asyncUserId();
 
 // Query function - sorts through db to find if user email exists
 const findUserByEmail = function(email) {
@@ -203,10 +233,10 @@ app.get('/', async function (req, res) {
 // homepage for users - redirect here after login + shows liked & saved resources
 // AL added below:
 app.get("/homepage", async function(req, res) {
-  if (!req.session.user_id) {
-    res.redirect('/register');
-  }
-  const templateVars = { resources: await getResourcesForUser() };
+  // if (!req.session.user_id) {
+  //   res.redirect('/register');
+  // }
+  const templateVars = { resources: await getResourcesForUser(), user: req.session.user_id };
   res.render("homepage", templateVars);
 })
 
@@ -236,10 +266,21 @@ app.get("/resource/:individualresource", (req, res) => {
 
 // POST routes
 
-app.post("/newresource", (req, res) => {
-  // let title = form input title
-  // take in req information and push it to database
-  //redirect to my my resources
+app.post("/newresource", async function(req, res) {
+  const userId = req.session.userId;//await getUserId(); // gets value from db through query function
+  const title = req.body.title;
+  const description = req.body.description;
+  const url = req.body.url;
+  const category = 4; //req.body.category; // this should be just a number, unless we change db to accept names
+  let newResource = {
+    userId,
+    category,
+    url,
+    title,
+    description
+  };
+  addNewResource(newResource);
+  res.redirect('/homepage');
 })
 
 app.post("/register", async function(req, res) {
@@ -258,6 +299,7 @@ app.post("/register", async function(req, res) {
       name,
       email,
       password
+<<<<<<< HEAD
     })
     req.session.user_id = email;
 <<<<<<< HEAD
@@ -270,6 +312,13 @@ app.post("/register", async function(req, res) {
     res.render("homepage", templateVars);
 >>>>>>> a53d065a7ac018b423bc193667e6d710db872384
     // res.redirect('homepage');
+=======
+    });
+  req.session.user_id = email;
+  const templateVars = { resources: await getResources(), user: req.session.user_id};
+  res.render('guestpage', templateVars);
+    // res.redirect('/homepage');
+>>>>>>> new
   }
 })
 
@@ -283,10 +332,17 @@ app.post("/", async function(req, res) {
   if (!user) {
     res.status(403).json({ message: "Email cannot be found" });
   } else if (user) {
+    // AL added next line:
+    const templateVars = { resources: await getResourcesForUser(), user: req.session.user_id};
     bcrypt.compare(psw, user['password'], function (err, isPasswordMatched) {
       if (isPasswordMatched) {
         req.session.user_id = username;
+<<<<<<< HEAD
         res.redirect("/homepage");
+=======
+        res.render('homepage', templateVars);
+        // res.redirect("/homepage");
+>>>>>>> new
       } else {
         res.render("register", { error: "Incorrect Password", user: user });
       }
