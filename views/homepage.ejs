@@ -17,14 +17,14 @@
   </head>
 
   <body>
-    <% if (user) { %>
+    <% if (resources.email) { %>
     <div class="sidenav">
       <img class="brain" src="/images/brain.png">
       <form id="SearchResources" method="GET">
         <textarea id="search" placeholder="Search Resources"></textarea>
         <div>
         </div>
-        <h4 style="margin: 1em">Logged In As: <%= user.email %></h4>
+        <h4 style="margin: 1em">Logged In As: <%= email %></h4>
         <button type="submit" class="btn btn-primary" style="margin: 1em">Logout</button>
       <div class="categories">
         <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Categories
@@ -55,6 +55,7 @@
             <th scope="col">Title</th>
             <th scope="col">URL</th>
             <th scope="col">Description</th>
+            <th scope="col">Added by</th>
 
           </tr>
         </thead>
@@ -62,9 +63,9 @@
           <% for(let resource in resources) { %>
             <tr class="table-row">
               <td><%= resources[resource].title %></td>
-              <td><%= resources[resource].URL %></td>
+              <td><%= resources[resource].url %></td>
               <td><%= resources[resource].description %></td>
-
+              <td><%= resources[resource].user %></td>
             </tr>
           <% } %>
         </tbody>
