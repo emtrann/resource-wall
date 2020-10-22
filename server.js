@@ -101,6 +101,7 @@ const getResourcesByCategory = function(category) {
   .catch(err => console.error('query error', err.stack));
 }
 
+// Query - gets individual resource in db
 const getIndividualResource = function(resourceTitle) {
   let queryString = `
   SELECT *
@@ -125,11 +126,30 @@ const getIndividualResource = function(resourceTitle) {
   .catch(err => console.error('query error', err.stack));
 }
 
-const asyncIndividualResource = async function() {
-  console.log(await getIndividualResource('Awesome business tutorial'))
-}
+// Query - goes through db using search form - only searches through title, url and description atm
+const getSearchResource = function(searchStr) {
+  let queryString = `
+  SELECT *
+  FROM resources
+  JOIN users ON user_id = users.id
+  WHERE title LIKE $1 OR url LIKE $1 OR description LIKE $1
+  `;
 
-asyncIndividualResource();
+  const query = {
+    text: queryString,
+    rowMode: 'array'
+  }
+
+  return pool.query(query, [`%${searchStr}%`])
+  .then(res => (res.rows.map(row => ({
+    name: row[7],
+    category: row[2],
+    url: row[3],
+    title: row[4],
+    description: row[5]
+  }))))
+  .catch(err => console.error('query error', err.stack));
+}
 
 
 // Query function - add new user to db
@@ -282,8 +302,25 @@ app.get("/resource/:individualresource", async function(req, res) {
   res.render("individualResource", templateVars)
 })
 
+// route for search results
+app.get("/search/:searchQuery", async function(req, res) {
+  let searchVar = req.params.searchQuery;
+  const templateVars = {
+    resources: await getSearchResource(searchVar)
+  }
+  console.log(templateVars)
+  res.render("searchResult", templateVars)
+})
+
 
 // POST routes
+
+// inputs form into end of query to get search results
+app.post("/search/:searchQuery", function(req, res) {
+  let searchQueryUrl = req.params.searchQuery;
+  searchQueryUrl = req.body.searchResult;
+  res.redirect(`/search/${searchQueryUrl}`)
+})
 
 app.post("/newresource", async function(req, res) {
   const userId = req.session.userId;//await getUserId(); // gets value from db through query function

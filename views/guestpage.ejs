@@ -20,10 +20,9 @@
 
     <div class="sidenav">
       <img class="brain" src="/images/brain.png">
-      <form id="SearchResources" method="GET">
-        <textarea id="search" placeholder="Search Resources"></textarea>
-        <div>
-        </div>
+      <form id="SearchResources" method="POST" action="/search/:searchQuery">
+        <textarea id="search" name="searchResult"placeholder="Search Resources"></textarea>
+        <button type="submit">Search</button>
       </form>
       <form method="POST">
       <div class="sign-in">
