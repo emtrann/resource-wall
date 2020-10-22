@@ -19,7 +19,9 @@
   <body>
 
     <div class="sidenav">
+      <a href="/">
       <img class="brain" src="/images/brain.png">
+    </a>
       <form id="SearchResources" method="POST" action="/search/:searchQuery">
         <textarea id="search" name="searchResult"placeholder="Search Resources"></textarea>
         <button type="submit">Search</button>
@@ -33,7 +35,9 @@
         <button type="submit">Login</button>
       </div>
       </form>
+      <div class="register">
       <a href="/register">Register</a>
+    </div>
       <div class="categories">
         <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Categories
           <span class="caret"></span></button>
@@ -70,7 +74,7 @@
           <% for(let resource in resources) { %>
             <tr class="table-row">
               <td><%= resources[resource].title %></td>
-              <td><%= resources[resource].url %></td>
+              <td><a href ="<%= resources[resource].url %>"><%=resources[resource].url %></a></td>
               <td><%= resources[resource].description %></td>
               <td><%= resources[resource].user %></td>
             </tr>
