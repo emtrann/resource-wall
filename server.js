@@ -53,6 +53,38 @@ const getResources = function () {
     .catch(err => console.error('query error', err.stack));
 };
 
+// Query function to get resources for one user
+const getResourcesForUser = function(email) {
+  let queryString = `
+  SELECT *
+  FROM resources
+  JOIN users ON user_id = users.id
+  WHERE email = $1;`;
+
+  const query = {
+    text: queryString,
+    rowMode: 'array'
+  }
+
+  return pool.query(query, [email])
+    .then(res => (res.rows.map(row => ({
+      name: row[7],
+      category: row[2],
+      url: row[3],
+      title: row[4],
+      description: row[5]
+    }))))
+    .catch(err => console.error('query error', err.stack));
+};
+
+const asyncResources = async function() {
+  console.log(await getResourcesForUser('tristanjacobs@gmail.com'));
+}
+
+asyncResources()
+
+
+
 // Query function - add new user to db
 const addNewUser = function (user) {
   return pool.query(`
@@ -89,7 +121,6 @@ const findUserCredentials = function(email) {
   .then(res => res.rows[0]);
 }
 
-// asyncEmail();
 
 // Load the logger first so all (static) HTTP requests are logged to STDOUT
 // 'dev' = Concise output colored by response status for development use.
@@ -171,13 +202,11 @@ app.get('/', async function (req, res) {
 
 // homepage for users - redirect here after login + shows liked & saved resources
 // AL added below:
-app.get("/homepage", (req, res) => {
+app.get("/homepage", async function(req, res) {
   if (!req.session.user_id) {
     res.redirect('/register');
   }
-  const userObject = resourcesForUser(resourcesDatabase, req.session.user_id);
-  const templateVars = { resources: userObject, user: users[req.session.user_id] };
-  console.log("This is the template:", templateVars);
+  const templateVars = { resources: await getResourcesForUser() };
   res.render("homepage", templateVars);
 })
 
@@ -252,7 +281,7 @@ app.post("/", async function(req, res) {
     bcrypt.compare(psw, user['password'], function (err, isPasswordMatched) {
       if (isPasswordMatched) {
         req.session.user_id = username;
-        res.redirect("/");
+        res.redirect("/homepage");
       } else {
         res.render("register", { error: "Incorrect Password", user: user });
       }
