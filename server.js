@@ -157,30 +157,6 @@ const categories = require("./routes/categories");
 
 // UP UNTIL HERE
 
-// const findUserByEmail = (usersDb, email) => {
-//   for (let user in usersDb) {
-//     const userObj = usersDb[user];
-//     if (userObj['email'] === email) {
-//       console.log(userObj['email'])
-//       return userObj;
-//     }
-//   }
-//   return false;
-// };
-
-// AL added below:
-// returns an object containing all resouces for a given userID:
-const resourcesForUser = function (database, id) {
-  const filteredResources = {};
-  for (let resourceId in database) {
-    const resourceObj = database[resourceId];
-    if (resourceObj.userID === id) {
-      filteredResources[resourceId] = resourceObj;
-    }
-  }
-  return filteredResources;
-};
-
 // Home page
 // Warning: avoid creating more routes in this file!
 // Separate them into separate routes files (see above).
@@ -188,12 +164,6 @@ const resourcesForUser = function (database, id) {
 // get root directory - evenutally should be page of resources for guest users
 
 // AL added below:
-// app.get('/', (req, res) => {
-//   const userObject = resourcesForUser(resourcesDatabase, 'user1'); // id hardcoded for now
-//   const templateVars = { resources: userObject }; //, user: 'user1' }; // ?
-//   res.render('guestpage', templateVars);
-// });
-
 app.get('/', async function (req, res) {
   const templateVars = { resources: await getResources() };
   res.render('guestpage', templateVars);
