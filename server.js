@@ -77,13 +77,6 @@ const getResourcesForUser = function(email) {
     .catch(err => console.error('query error', err.stack));
 };
 
-<<<<<<< HEAD
-// const asyncResources = async function() {
-//   console.log(await getResourcesForUser('tristanjacobs@gmail.com'));
-// }
-
-// asyncResources()
-=======
 const getResourcesByCategory = function(category) {
   let queryString = `
   SELECT *
@@ -106,7 +99,6 @@ const getResourcesByCategory = function(category) {
   }))))
   .catch(err => console.error('query error', err.stack));
 }
->>>>>>> category-routes
 
 //-------- NEW
 // Query function - add new resource to db
@@ -261,19 +253,12 @@ app.get('/', async function (req, res) {
 // homepage for users - redirect here after login + shows liked & saved resources
 // AL added below:
 app.get("/homepage", async function(req, res) {
-<<<<<<< HEAD
-  // if (!req.session.user_id) {
-  //   res.redirect('/register');
-  // }
-  const templateVars = { resources: await getResourcesForUser(), user: req.session.user_id };
-=======
   if (!req.session.user_id) {
     res.redirect('/register');
   }
   const templateVars = {
     user: req.session.user_id,
     resources: await getResourcesForUser(req.session.user_id) };
->>>>>>> 417371a02f24dbbc94a3302a3f3d0a808cad00b1
   res.render("homepage", templateVars);
 })
 
@@ -306,7 +291,6 @@ app.get("/resource/:individualresource", (req, res) => {
 
 // POST routes
 
-<<<<<<< HEAD
 app.post("/newresource", async function(req, res) {
   const userId = req.session.userId;//await getUserId(); // gets value from db through query function
   const title = req.body.title;
@@ -323,13 +307,6 @@ app.post("/newresource", async function(req, res) {
   addNewResource(newResource);
   res.redirect('/homepage');
 })
-=======
-// app.post("/newresource", (req, res) => {
-//   // let title = form input title
-//   // take in req information and push it to database
-//   //redirect to my my resources
-// })
->>>>>>> 417371a02f24dbbc94a3302a3f3d0a808cad00b1
 
 app.post("/register", async function(req, res) {
   const name = req.body.username;
