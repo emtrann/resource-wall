@@ -152,16 +152,6 @@ const getSearchResource = function(searchStr) {
 }
 
 
-// Query function - add new user to db
-const addNewUser = function (user) {
-  return pool.query(`
-    INSERT INTO users (name, email, password)
-    VALUES ($1, $2, $3)
-    RETURNING *;`,
-      [user.name, user.email, user.password])
-    .then(res => res.rows[0])
-    .catch(err => console.error('query error', err.stack));
-}
 
 // Query function - add new resource to db
 const addNewResource = function (resource) {
@@ -188,6 +178,18 @@ const asyncUserId = async function() {
 }
 asyncUserId();
 
+
+// Query function - add new user to db
+const addNewUser = function (user) {
+  return pool.query(`
+    INSERT INTO users (name, email, password)
+    VALUES ($1, $2, $3)
+    RETURNING *;`,
+      [user.name, user.email, user.password])
+    .then(res => res.rows[0])
+    .catch(err => console.error('query error', err.stack));
+}
+
 // Query function - sorts through db to find if user email exists
 const findUserByEmail = function(email) {
   return pool.query(`
@@ -198,9 +200,26 @@ const findUserByEmail = function(email) {
   .then(res => res.rows[0]);
 }
 
-// const asyncEmail = async function() {
-//   console.log(await findUserByEmail('12312@gmail.com'));
-// }
+//Query function - finds all info for users to go onto profile
+const findUserInfo = function(email) {
+  const queryString = `
+  SELECT *
+  FROM users
+  WHERE email = $1;
+  `
+
+  const query = {
+    text: queryString,
+    rowMode: 'array'
+  }
+
+  return pool.query(query, [email])
+  .then(res => (res.rows.map(row => ({
+    id: row[0],
+    name: row[1],
+    email: row[2],
+  }))))
+}
 
 // Query function - finds user and password in db
 const findUserCredentials = function(email) {
@@ -312,7 +331,17 @@ app.get("/search/:searchQuery", async function(req, res) {
   res.render("searchResult", templateVars)
 })
 
-
+// profile route
+app.get("/profile", async function(req, res) {
+  if (!req.session.user_id) {
+    res.status(400).json({ message: 'Please sign in to view your profile' });
+  } else {
+    const templateVars = {
+      user: await findUserInfo(req.session.user_id)
+    }
+    res.render("profile", templateVars)
+  }
+})
 // POST routes
 
 // inputs form into end of query to get search results
