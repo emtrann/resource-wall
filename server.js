@@ -100,43 +100,6 @@ const getResourcesByCategory = function(category) {
   .catch(err => console.error('query error', err.stack));
 }
 
-//-------- NEW
-// Query function - add new resource to db
-const addNewResource = function (resource) {
-  return pool.query(`
-  INSERT INTO resources (user_id, category_id, url, title, description)
-  VALUES ($1, $2, $3, $4, $5)
-  RETURNING *;
-  `, [resource.userId, resource.category, resource.url, resource.title, resource.description])
-  .then(res => res.rows[0])
-  .catch(err => console.error('query error', err.stack));
-}
-
-const getUserId = function () {
-  return pool.query( `
-  SELECT id
-  FROM users
-  WHERE email = 'tristanjacobs@gmail.com'
-  `)
-}
-
-app.post("/newresource", (req, res) => {
-  const userId = 1; // this should come from the db through query function
-  const title = req.body.title;
-  const description = req.body.description;
-  const url = req.body.url;
-  const category = 4; //req.body.category; // this should be just a number, unless we change db to accept names
-  addNewResource({
-    userId,
-    category,
-    url,
-    title,
-    description
-  });
-
-  res.redirect('/homepage');
-})
-// ----------------
 
 // Query function - add new user to db
 const addNewUser = function (user) {
@@ -159,12 +122,6 @@ const addNewResource = function (resource) {
   .then(res => res.rows)
   .catch(err => console.error('query error', err.stack));
 };
-
-const asyncEmail = async function() {
-  console.log(await addNewResource({
-
-  }));
-}
 
 const getUserId = function () {
   return pool.query( `
@@ -278,7 +235,7 @@ app.get("/category/:categoryID", async function(req, res) {
 // route to register
 // AL added below:
 app.get("/register", (req, res) => {
-  const templateVars = { user: users[req.session.user_id] };
+  const templateVars = { user: req.session.user_id };
   res.render("register", templateVars);
 });
 
@@ -327,7 +284,7 @@ app.post("/register", async function(req, res) {
 
     })
     req.session.user_id = email;
-    const templateVars = { resources: await getResourcesForUser(), user: req.session.user_id };
+    const templateVars = { resources: await getResourcesForUser(), users: req.session.user_id };
   res.render("homepage", templateVars);
 
     // res.redirect('homepage');
