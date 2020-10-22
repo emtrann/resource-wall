@@ -64,6 +64,8 @@ const getResourcesForUser = function(email) {
     }))))
     .catch(err => console.error('query error', err.stack));
 };
+
+// Sorts out db resources and displays them by category
 const getResourcesByCategory = function(category) {
   let queryString = `
   SELECT *
@@ -84,16 +86,59 @@ const getResourcesByCategory = function(category) {
   }))))
   .catch(err => console.error('query error', err.stack));
 }
-// Query function - add new user to db
-const addNewUser = function (user) {
-  return pool.query(`
-    INSERT INTO users (name, email, password)
-    VALUES ($1, $2, $3)
-    RETURNING *;`,
-      [user.name, user.email, user.password])
-    .then(res => res.rows[0])
-    .catch(err => console.error('query error', err.stack));
+
+// Query - gets individual resource in db
+const getIndividualResource = function(resourceTitle) {
+  let queryString = `
+  SELECT *
+  FROM resources
+  JOIN users ON user_id = users.id
+  WHERE title LIKE $1;
+  `;
+
+  const query = {
+    text: queryString,
+    rowMode: 'array'
+  }
+
+  return pool.query(query, [`%${resourceTitle}%`])
+  .then(res => (res.rows.map(row => ({
+    name: row[7],
+    category: row[2],
+    url: row[3],
+    title: row[4],
+    description: row[5]
+  }))))
+  .catch(err => console.error('query error', err.stack));
 }
+
+// Query - goes through db using search form - only searches through title, url and description atm
+const getSearchResource = function(searchStr) {
+  let queryString = `
+  SELECT *
+  FROM resources
+  JOIN users ON user_id = users.id
+  WHERE title LIKE $1 OR url LIKE $1 OR description LIKE $1
+  `;
+
+  const query = {
+    text: queryString,
+    rowMode: 'array'
+  }
+
+  return pool.query(query, [`%${searchStr}%`])
+  .then(res => (res.rows.map(row => ({
+    name: row[7],
+    category: row[2],
+    url: row[3],
+    title: row[4],
+    description: row[5]
+  }))))
+  .catch(err => console.error('query error', err.stack));
+}
+
+
+
 // Query function - add new resource to db
 const addNewResource = function (resource) {
   return pool.query(`
@@ -116,6 +161,19 @@ const asyncUserId = async function() {
   console.log('user ID: ', await getUserId());
 }
 asyncUserId();
+
+
+// Query function - add new user to db
+const addNewUser = function (user) {
+  return pool.query(`
+    INSERT INTO users (name, email, password)
+    VALUES ($1, $2, $3)
+    RETURNING *;`,
+      [user.name, user.email, user.password])
+    .then(res => res.rows[0])
+    .catch(err => console.error('query error', err.stack));
+}
+
 // Query function - sorts through db to find if user email exists
 const findUserByEmail = function(email) {
   return pool.query(`
@@ -125,9 +183,28 @@ const findUserByEmail = function(email) {
   `, [email])
   .then(res => res.rows[0]);
 }
-// const asyncEmail = async function() {
-//   console.log(await findUserByEmail('12312@gmail.com'));
-// }
+
+//Query function - finds all info for users to go onto profile
+const findUserInfo = function(email) {
+  const queryString = `
+  SELECT *
+  FROM users
+  WHERE email = $1;
+  `
+
+  const query = {
+    text: queryString,
+    rowMode: 'array'
+  }
+
+  return pool.query(query, [email])
+  .then(res => (res.rows.map(row => ({
+    id: row[0],
+    name: row[1],
+    email: row[2],
+  }))))
+}
+
 // Query function - finds user and password in db
 const findUserCredentials = function(email) {
   return pool.query(`
@@ -163,6 +240,7 @@ const individualResourceRoutes = require("./routes/individualResource");
 const newResourceRoutes = require("./routes/newResource");
 const register = require("./routes/register");
 const categories = require("./routes/categories");
+const { request } = require('express');
 // const login = require("./routes/login-route.js");
 // Home page
 // Warning: avoid creating more routes in this file!
@@ -202,10 +280,45 @@ app.get("/register", (req, res) => {
   res.render("register", templateVars);
 });
 // route for individual resources
-app.get("/resource/:individualresource", (req, res) => {
-  res.render("individualResource")
+app.get("/resource/:individualresource", async function(req, res) {
+  console.log(req.params.individualresource);
+  let newTitle = req.params.individualresource.split('+').join(' ');
+  const templateVars = {
+    resources: await getIndividualResource(newTitle)
+  }
+  res.render("individualResource", templateVars)
+})
+
+// route for search results
+app.get("/search/:searchQuery", async function(req, res) {
+  let searchVar = req.params.searchQuery;
+  const templateVars = {
+    resources: await getSearchResource(searchVar)
+  }
+  console.log(templateVars)
+  res.render("searchResult", templateVars)
+})
+
+// profile route
+app.get("/profile", async function(req, res) {
+  if (!req.session.user_id) {
+    res.status(400).json({ message: 'Please sign in to view your profile' });
+  } else {
+    const templateVars = {
+      user: await findUserInfo(req.session.user_id)
+    }
+    res.render("profile", templateVars)
+  }
 })
 // POST routes
+
+// inputs form into end of query to get search results
+app.post("/search/:searchQuery", function(req, res) {
+  let searchQueryUrl = req.params.searchQuery;
+  searchQueryUrl = req.body.searchResult;
+  res.redirect(`/search/${searchQueryUrl}`)
+})
+
 app.post("/newresource", async function(req, res) {
   const userId = req.session.userId;//await getUserId(); // gets value from db through query function
   const title = req.body.title;
@@ -240,7 +353,7 @@ app.post("/register", async function(req, res) {
       password
     })
     req.session.user_id = email;
-    const templateVars = { resources: await getResourcesForUser(), user: req.session.user_id };
+    const templateVars = { resources: await getResourcesForUser(), users: req.session.user_id };
   res.render("homepage", templateVars);
     // res.redirect('homepage');
   }
