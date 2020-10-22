@@ -64,7 +64,6 @@ const getResourcesForUser = function(email) {
     }))))
     .catch(err => console.error('query error', err.stack));
 };
-
 // Sorts out db resources and displays them by category
 const getResourcesByCategory = function(category) {
   let queryString = `
@@ -86,7 +85,6 @@ const getResourcesByCategory = function(category) {
   }))))
   .catch(err => console.error('query error', err.stack));
 }
-
 // Query - gets individual resource in db
 const getIndividualResource = function(resourceTitle) {
   let queryString = `
@@ -95,12 +93,10 @@ const getIndividualResource = function(resourceTitle) {
   JOIN users ON user_id = users.id
   WHERE title LIKE $1;
   `;
-
   const query = {
     text: queryString,
     rowMode: 'array'
   }
-
   return pool.query(query, [`%${resourceTitle}%`])
   .then(res => (res.rows.map(row => ({
     name: row[7],
@@ -111,7 +107,6 @@ const getIndividualResource = function(resourceTitle) {
   }))))
   .catch(err => console.error('query error', err.stack));
 }
-
 // Query - goes through db using search form - only searches through title, url and description atm
 const getSearchResource = function(searchStr) {
   let queryString = `
@@ -120,12 +115,10 @@ const getSearchResource = function(searchStr) {
   JOIN users ON user_id = users.id
   WHERE title LIKE $1 OR url LIKE $1 OR description LIKE $1
   `;
-
   const query = {
     text: queryString,
     rowMode: 'array'
   }
-
   return pool.query(query, [`%${searchStr}%`])
   .then(res => (res.rows.map(row => ({
     name: row[7],
@@ -136,9 +129,6 @@ const getSearchResource = function(searchStr) {
   }))))
   .catch(err => console.error('query error', err.stack));
 }
-
-
-
 // Query function - add new resource to db
 const addNewResource = function (resource) {
   return pool.query(`
@@ -161,8 +151,6 @@ const asyncUserId = async function() {
   console.log('user ID: ', await getUserId());
 }
 asyncUserId();
-
-
 // Query function - add new user to db
 const addNewUser = function (user) {
   return pool.query(`
@@ -173,7 +161,6 @@ const addNewUser = function (user) {
     .then(res => res.rows[0])
     .catch(err => console.error('query error', err.stack));
 }
-
 // Query function - sorts through db to find if user email exists
 const findUserByEmail = function(email) {
   return pool.query(`
@@ -183,7 +170,6 @@ const findUserByEmail = function(email) {
   `, [email])
   .then(res => res.rows[0]);
 }
-
 //Query function - finds all info for users to go onto profile
 const findUserInfo = function(email) {
   const queryString = `
@@ -191,12 +177,10 @@ const findUserInfo = function(email) {
   FROM users
   WHERE email = $1;
   `
-
   const query = {
     text: queryString,
     rowMode: 'array'
   }
-
   return pool.query(query, [email])
   .then(res => (res.rows.map(row => ({
     id: row[0],
@@ -204,7 +188,6 @@ const findUserInfo = function(email) {
     email: row[2],
   }))))
 }
-
 // Query function - finds user and password in db
 const findUserCredentials = function(email) {
   return pool.query(`
@@ -213,17 +196,6 @@ const findUserCredentials = function(email) {
   WHERE email = $1;
   `, [email])
   .then(res => res.rows[0]);
-}
-
-
-const addRating = function(rating, resourceId) {
-  return pool.query(
-    `INSERT INTO resource_ratings (rating, resource_id)
-    VALUES ( $1, $2 )
-    RETURNING *;`,
-    [rating, resourceId])
-    .then(res => res.rows[0])
-    .catch(err => console.error("Rating not submitted: ", err));
 }
 // Load the logger first so all (static) HTTP requests are logged to STDOUT
 // 'dev' = Concise output colored by response status for development use.
@@ -299,7 +271,6 @@ app.get("/resource/:individualresource", async function(req, res) {
   }
   res.render("individualResource", templateVars)
 })
-
 // route for search results
 app.get("/search/:searchQuery", async function(req, res) {
   let searchVar = req.params.searchQuery;
@@ -309,7 +280,6 @@ app.get("/search/:searchQuery", async function(req, res) {
   console.log(templateVars)
   res.render("searchResult", templateVars)
 })
-
 // profile route
 app.get("/profile", async function(req, res) {
   if (!req.session.user_id) {
@@ -322,14 +292,12 @@ app.get("/profile", async function(req, res) {
   }
 })
 // POST routes
-
 // inputs form into end of query to get search results
 app.post("/search/:searchQuery", function(req, res) {
   let searchQueryUrl = req.params.searchQuery;
   searchQueryUrl = req.body.searchResult;
   res.redirect(`/search/${searchQueryUrl}`)
 })
-
 app.post("/newresource", async function(req, res) {
   const userId = 1; //req.session.userId;//await getUserId(); // gets value from db through query function
   const title = req.body.title;
