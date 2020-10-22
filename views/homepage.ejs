@@ -17,14 +17,27 @@
   </head>
 
   <body>
-    <% if (user) { %>
+
+
+    <% if (resources.email) { %>
     <div class="sidenav">
       <img class="brain" src="/images/brain.png">
       <form id="SearchResources" method="GET">
         <textarea id="search" placeholder="Search Resources"></textarea>
         <div>
         </div>
+<<<<<<< HEAD
         <h4 style="margin: 1em">Logged In As: <%= user %></h4>
+=======
+        <% if (user) { %>
+        <h4 style="margin: 4em" font="bold">Logged In As: <%= user %></h4>
+        <button type="submit" class="btn btn-primary" >Logout</button>
+        <% } %>
+        <div class="new-resource">
+          <button type="submit" class="btn btn-primary">Make New Resource</button>
+        </div>
+        <h4 style="margin: 1em">Logged In As: <%= email %></h4>
+>>>>>>> a53d065a7ac018b423bc193667e6d710db872384
         <button type="submit" class="btn btn-primary" style="margin: 1em">Logout</button>
       <div class="categories">
         <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Categories
@@ -38,12 +51,12 @@
         </ul>
         </div>
       </div>
-      <% } %>
+
     </div>
     </div>
     <div class="main">
 
-    <img class="book" src="/images/book.png">
+    <img class="book" src="/images/myresources.png">
 
 
     <div class="feature" >
@@ -55,6 +68,7 @@
             <th scope="col">Title</th>
             <th scope="col">URL</th>
             <th scope="col">Description</th>
+            <th scope="col">Added by</th>
 
           </tr>
         </thead>
@@ -62,14 +76,23 @@
           <% for(let resource in resources) { %>
             <tr class="table-row">
               <td><%= resources[resource].title %></td>
-              <td><%= resources[resource].URL %></td>
+              <td><%= resources[resource].url %></td>
               <td><%= resources[resource].description %></td>
-
+              <td><%= resources[resource].user %></td>
             </tr>
           <% } %>
         </tbody>
       </table>
-    </div>
+  </div>
+  <div class="likes">
+    <img class="heart" src="/images/heart.png">
+    <table class="liked-content">
+      <thead>
+        <th scope="col">Title</th>
+        <th scope ="col">URL</th>
+        <th scope="col">Description</th>
+      </thead>
+    </table>
   </div>
   </body>
 </html>
