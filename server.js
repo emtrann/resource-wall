@@ -299,26 +299,13 @@ app.post("/register", async function(req, res) {
       name,
       email,
       password
-<<<<<<< HEAD
+
     })
     req.session.user_id = email;
-<<<<<<< HEAD
     const templateVars = { resources: await getResourcesForUser(), user: req.session.user_id };
   res.render("homepage", templateVars);
-=======
-    const userObject = resourcesForUser(resourcesDatabase, req.session.user_id);
-    const templateVars = { resources: userObject, user: req.session.user_id };
-    console.log("This is the template:", templateVars);
-    res.render("homepage", templateVars);
->>>>>>> a53d065a7ac018b423bc193667e6d710db872384
+
     // res.redirect('homepage');
-=======
-    });
-  req.session.user_id = email;
-  const templateVars = { resources: await getResources(), user: req.session.user_id};
-  res.render('guestpage', templateVars);
-    // res.redirect('/homepage');
->>>>>>> new
   }
 })
 
@@ -337,12 +324,7 @@ app.post("/", async function(req, res) {
     bcrypt.compare(psw, user['password'], function (err, isPasswordMatched) {
       if (isPasswordMatched) {
         req.session.user_id = username;
-<<<<<<< HEAD
         res.redirect("/homepage");
-=======
-        res.render('homepage', templateVars);
-        // res.redirect("/homepage");
->>>>>>> new
       } else {
         res.render("register", { error: "Incorrect Password", user: user });
       }
