@@ -65,7 +65,6 @@ const getResourcesForUser = function(email) {
     .catch(err => console.error('query error', err.stack));
 };
 
-<<<<<<< HEAD
 // Sorts out db resources and displays them by category
 const getResourcesByCategory = function(category) {
   let queryString = `
@@ -136,23 +135,6 @@ const getSearchResource = function(searchStr) {
     description: row[5]
   }))))
   .catch(err => console.error('query error', err.stack));
-=======
-// const asyncResources = async function() {
-//   console.log(await getResourcesForUser('tristanjacobs@gmail.com'));
-// }
-
-// asyncResources()
-
-// Query function - add new user to db
-const addNewUser = function (user) {
-  return pool.query(`
-    INSERT INTO users (name, email, password)
-    VALUES ($1, $2, $3)
-    RETURNING *;`,
-      [user.name, user.email, user.password])
-    .then(res => res.rows[0])
-    .catch(err => console.error('query error', err.stack));
->>>>>>> jquery
 }
 
 
@@ -175,18 +157,10 @@ const getUserId = function () {
   `)
   .then(res => res.rows[0].id)
 };
-<<<<<<< HEAD
 const asyncUserId = async function() {
   console.log('user ID: ', await getUserId());
 }
 asyncUserId();
-=======
-
-// const asyncUserId = async function() {
-//   console.log('user ID: ', await getUserId());
-// }
-// asyncUserId();
->>>>>>> jquery
 
 
 // Query function - add new user to db
@@ -349,7 +323,6 @@ app.get("/profile", async function(req, res) {
 })
 // POST routes
 
-<<<<<<< HEAD
 // inputs form into end of query to get search results
 app.post("/search/:searchQuery", function(req, res) {
   let searchQueryUrl = req.params.searchQuery;
@@ -357,8 +330,6 @@ app.post("/search/:searchQuery", function(req, res) {
   res.redirect(`/search/${searchQueryUrl}`)
 })
 
-=======
->>>>>>> jquery
 app.post("/newresource", async function(req, res) {
   const userId = 1; //req.session.userId;//await getUserId(); // gets value from db through query function
   const title = req.body.title;
@@ -375,10 +346,6 @@ app.post("/newresource", async function(req, res) {
 
   res.redirect('/homepage');
 })
-<<<<<<< HEAD
-=======
-
->>>>>>> jquery
 app.post("/register", async function(req, res) {
   const name = req.body.username;
   const email = req.body.email;
