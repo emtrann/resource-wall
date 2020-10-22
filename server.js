@@ -65,6 +65,7 @@ const getResourcesForUser = function(email) {
     .catch(err => console.error('query error', err.stack));
 };
 
+<<<<<<< HEAD
 // Sorts out db resources and displays them by category
 const getResourcesByCategory = function(category) {
   let queryString = `
@@ -135,6 +136,23 @@ const getSearchResource = function(searchStr) {
     description: row[5]
   }))))
   .catch(err => console.error('query error', err.stack));
+=======
+// const asyncResources = async function() {
+//   console.log(await getResourcesForUser('tristanjacobs@gmail.com'));
+// }
+
+// asyncResources()
+
+// Query function - add new user to db
+const addNewUser = function (user) {
+  return pool.query(`
+    INSERT INTO users (name, email, password)
+    VALUES ($1, $2, $3)
+    RETURNING *;`,
+      [user.name, user.email, user.password])
+    .then(res => res.rows[0])
+    .catch(err => console.error('query error', err.stack));
+>>>>>>> jquery
 }
 
 
@@ -142,7 +160,7 @@ const getSearchResource = function(searchStr) {
 // Query function - add new resource to db
 const addNewResource = function (resource) {
   return pool.query(`
-  INSERT INTO resources (user_id, category_id, url, title, description)
+  INSERT INTO resources (user_id, category_name, url, title, description)
   VALUES ($1, $2, $3, $4, $5)
   RETURNING *;
   `, [resource.userId, resource.category, resource.url, resource.title, resource.description])
@@ -157,10 +175,18 @@ const getUserId = function () {
   `)
   .then(res => res.rows[0].id)
 };
+<<<<<<< HEAD
 const asyncUserId = async function() {
   console.log('user ID: ', await getUserId());
 }
 asyncUserId();
+=======
+
+// const asyncUserId = async function() {
+//   console.log('user ID: ', await getUserId());
+// }
+// asyncUserId();
+>>>>>>> jquery
 
 
 // Query function - add new user to db
@@ -323,6 +349,7 @@ app.get("/profile", async function(req, res) {
 })
 // POST routes
 
+<<<<<<< HEAD
 // inputs form into end of query to get search results
 app.post("/search/:searchQuery", function(req, res) {
   let searchQueryUrl = req.params.searchQuery;
@@ -330,22 +357,28 @@ app.post("/search/:searchQuery", function(req, res) {
   res.redirect(`/search/${searchQueryUrl}`)
 })
 
+=======
+>>>>>>> jquery
 app.post("/newresource", async function(req, res) {
-  const userId = req.session.userId;//await getUserId(); // gets value from db through query function
+  const userId = 1; //req.session.userId;//await getUserId(); // gets value from db through query function
   const title = req.body.title;
   const description = req.body.description;
   const url = req.body.url;
-  const category = 4; //req.body.category; // this should be just a number, unless we change db to accept names
-  let newResource = {
+  const category = req.body.category;
+  addNewResource ({
     userId,
     category,
     url,
     title,
     description
-  };
-  addNewResource(newResource);
+  });
+
   res.redirect('/homepage');
 })
+<<<<<<< HEAD
+=======
+
+>>>>>>> jquery
 app.post("/register", async function(req, res) {
   const name = req.body.username;
   const email = req.body.email;

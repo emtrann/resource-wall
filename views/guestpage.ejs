@@ -14,6 +14,9 @@
 
     <script type="text/javascript" src="/vendor/jquery-3.0.0.js"></script>
     <script type="text/javascript" src="/scripts/app.js"></script>
+
+    <!-- Internal jquery -->
+    <script type="text/javascript" src="/scripts/login-on-click.js"></script>
   </head>
 
   <body>
@@ -26,13 +29,18 @@
         <textarea id="search" name="searchResult"placeholder="Search Resources"></textarea>
         <button type="submit">Search</button>
       </form>
-      <form method="POST">
+
+      <button id="login-button">
+        <span>Login</span>
+        </button>
+
+      <form id="login-form" method="POST">
       <div class="sign-in">
-        <label for="username"><b>Username</b></label>
+        <label  for="username"><b>Username</b></label>
         <input type="text" placeholder="Enter Username" name="username" required>
         <label for="psw"><b>Password</b></label>
         <input type="password" placeholder="Enter Password" name="psw" required>
-        <button type="submit">Login</button>
+        <button type="submit">Submit</button>
       </div>
       </form>
       <div class="register">
