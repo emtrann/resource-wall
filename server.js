@@ -364,9 +364,7 @@ app.post("/register", async function(req, res) {
       password
     })
     req.session.user_id = email;
-    const templateVars = { resources: await getResourcesForUser(), users: req.session.user_id };
-  res.render("homepage", templateVars);
-    // res.redirect('homepage');
+    res.redirect("/homepage");
   }
 })
 //login - change username to email **, error to pop up for incorrect password
