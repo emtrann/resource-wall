@@ -207,6 +207,7 @@ app.get("/homepage", (req, res) => {
   }
   const userObject = resourcesForUser(resourcesDatabase, req.session.user_id);
   const templateVars = { resources: userObject, user: users[req.session.user_id] };
+  console.log("This is the template:", templateVars);
   res.render("homepage", templateVars);
 })
 
@@ -260,7 +261,11 @@ app.post("/register", async function(req, res) {
       password
     })
     req.session.user_id = email;
-    res.redirect('homepage');
+    const userObject = resourcesForUser(resourcesDatabase, req.session.user_id);
+    const templateVars = { resources: userObject, user: req.session.user_id };
+    console.log("This is the template:", templateVars);
+    res.render("homepage", templateVars);
+    // res.redirect('homepage');
   }
 })
 
