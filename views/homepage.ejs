@@ -17,15 +17,21 @@
   </head>
 
   <body>
-    <% if (user) { %>
+
+
     <div class="sidenav">
       <img class="brain" src="/images/brain.png">
       <form id="SearchResources" method="GET">
         <textarea id="search" placeholder="Search Resources"></textarea>
         <div>
         </div>
-        <h4 style="margin: 1em">Logged In As: <%= user.email %></h4>
-        <button type="submit" class="btn btn-primary" style="margin: 1em">Logout</button>
+        <% if (user) { %>
+        <h4 style="margin: 4em" font="bold">Logged In As: <%= user %></h4>
+        <button type="submit" class="btn btn-primary" >Logout</button>
+        <% } %>
+        <div class="new-resource">
+          <button type="submit" class="btn btn-primary">Make New Resource</button>
+        </div>
       <div class="categories">
         <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Categories
           <span class="caret"></span></button>
@@ -38,12 +44,12 @@
         </ul>
         </div>
       </div>
-      <% } %>
+
     </div>
     </div>
     <div class="main">
 
-    <img class="book" src="/images/book.png">
+    <img class="book" src="/images/myresources.png">
 
 
     <div class="feature" >
@@ -69,7 +75,16 @@
           <% } %>
         </tbody>
       </table>
-    </div>
+  </div>
+  <div class="likes">
+    <img class="heart" src="/images/heart.png">
+    <table class="liked-content">
+      <thead>
+        <th scope="col">Title</th>
+        <th scope ="col">URL</th>
+        <th scope="col">Description</th>
+      </thead>
+    </table>
   </div>
   </body>
 </html>
