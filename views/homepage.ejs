@@ -1,40 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <title>Home Page</title>
 
-    <link rel="stylesheet" href="/vendor/normalize-4.1.1.css" type="text/css" />
-    <link rel="stylesheet" href="/vendor/border-box.css" type="text/css" />
-    <link rel="stylesheet" href="/styles/layout.css" type="text/css" />
-    <link rel="stylesheet" href="/styles/side-nav.css" type="text/css" />
-    <link rel="stylesheet" href="/styles/resources.css" type="text/css" />
-    <!-- <link rel="stylesheet" href="/vendor/layout.css" type="text/css" /> -->
-    <!-- font -->
-    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue:300,300i,700,700i&display=swap" rel="stylesheet">
+<head>
+  <title>Home Page</title>
+  <link rel="stylesheet" href="/vendor/normalize-4.1.1.css" type="text/css" />
+  <link rel="stylesheet" href="/vendor/border-box.css" type="text/css" />
+  <link rel="stylesheet" href="/styles/layout.css" type="text/css" />
+  <link rel="stylesheet" href="/styles/side-nav.css" type="text/css" />
+  <link rel="stylesheet" href="/styles/resources.css" type="text/css" />
+  <!-- <link rel="stylesheet" href="/vendor/layout.css" type="text/css" /> -->
+  <!-- font -->
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue:300,300i,700,700i&display=swap" rel="stylesheet">
+  <script type="text/javascript" src="/vendor/jquery-3.0.0.js"></script>
+  <script type="text/javascript" src="/scripts/app.js"></script>
+</head>
 
-    <script type="text/javascript" src="/vendor/jquery-3.0.0.js"></script>
-    <script type="text/javascript" src="/scripts/app.js"></script>
-  </head>
-
-  <body>
-
-
-    <% if (resources.email) { %>
-    <div class="sidenav">
-      <img class="brain" src="/images/brain.png">
-      <form id="SearchResources" method="GET">
-        <textarea id="search" placeholder="Search Resources"></textarea>
-        <div>
-        </div>
-        <% if (user) { %>
-        <h4 style="margin: 4em" font="bold">Logged In As: <%= user %></h4>
-        <button type="submit" class="btn btn-primary" >Logout</button>
-        <% } %>
-        <div class="new-resource">
-          <button type="submit" class="btn btn-primary">Make New Resource</button>
-        </div>
-        <h4 style="margin: 1em">Logged In As: <%= email %></h4>
-        <button type="submit" class="btn btn-primary" style="margin: 1em">Logout</button>
+<body>
+  <div class="sidenav">
+    <img class="brain" src="/images/brain.png">
+    <form id="SearchResources" method="GET">
+      <textarea id="search" placeholder="Search Resources"></textarea>
+    </form>
+      <div>
+      </div>
+      <% if (user) { %>
+      <h4 style="margin: 4em" font="bold">Logged In As: <%= user %></h4>
+      <form class="form-inline" method="POST" action="/logout">
+        <button type="submit" class="btn btn-primary">Logout</button>
+      </form>
+      <% } %>
+      <div class="new-resource">
+        <button type="submit" class="btn btn-primary">Make New Resource</button>
+      </div>
       <div class="categories">
         <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Categories
           <span class="caret"></span></button>
@@ -42,53 +39,45 @@
           <a href="#web-development">Web Development</a>
           <a href="#business">Business</a>
           <a href="#photography">Photography</a>
-           <a href="#design">Design</a>
+          <a href="#design">Design</a>
           <a href="#science">Science</a>
         </ul>
-        </div>
       </div>
-
-    </div>
-    </div>
-    <div class="main">
-
+  </div>
+  </div>
+  </div>
+  <div class="main">
     <img class="book" src="/images/myresources.png">
-
-
-    <div class="feature" >
-
-
+    <div class="feature">
       <table class="table">
         <thead>
           <tr class="table-head">
             <th scope="col">Title</th>
             <th scope="col">URL</th>
             <th scope="col">Description</th>
-            <th scope="col">Added by</th>
-
           </tr>
         </thead>
         <tbody>
           <% for(let resource in resources) { %>
-            <tr class="table-row">
-              <td><%= resources[resource].title %></td>
-              <td><%= resources[resource].url %></td>
-              <td><%= resources[resource].description %></td>
-              <td><%= resources[resource].user %></td>
-            </tr>
+          <tr class="table-row">
+            <td><%= resources[resource].title %></td>
+            <td><%= resources[resource].URL %></td>
+            <td><%= resources[resource].description %></td>
+          </tr>
           <% } %>
         </tbody>
       </table>
-  </div>
-  <div class="likes">
-    <img class="heart" src="/images/heart.png">
-    <table class="liked-content">
-      <thead>
-        <th scope="col">Title</th>
-        <th scope ="col">URL</th>
-        <th scope="col">Description</th>
-      </thead>
-    </table>
-  </div>
-  </body>
+    </div>
+    <div class="likes">
+      <img class="heart" src="/images/heart.png">
+      <table class="liked-content">
+        <thead>
+          <th scope="col">Title</th>
+          <th scope="col">URL</th>
+          <th scope="col">Description</th>
+        </thead>
+      </table>
+    </div>
+</body>
+
 </html>
