@@ -292,6 +292,16 @@ const likedByUser = function(user) {
   .catch(err => console.error('query error', err.stack));
 }
 
+// Updates name in database
+const updateName = function(newName, email) {
+  return pool.query(`
+  UPDATE users
+  SET name = $1
+  WHERE email = $2
+  `, [newName, email])
+  .then(res => res.rows[0]);
+}
+
 // Load the logger first so all (static) HTTP requests are logged to STDOUT
 // 'dev' = Concise output colored by response status for development use.
 //         The :status token will be colored red for server error codes, yellow for client error codes, cyan for redirection codes, and uncolored for all other codes.
@@ -392,7 +402,8 @@ app.get("/profile", async function(req, res) {
     res.status(400).json({ message: 'Please sign in to view your profile' });
   } else {
     const templateVars = {
-      user: await findUserInfo(req.session.user_id)
+      information: await findUserInfo(req.session.user_id),
+      user: req.session.user_id
     }
     res.render("profile", templateVars)
   }
@@ -499,6 +510,12 @@ app.post("/resource/:individualresource/liked", async function(req, res) {
   let resourceVar = await findResourceIdByTitle(resParam);
   addUserLike(user, resourceVar['id'])
   res.redirect("/homepage")
+})
+
+app.post("/update/name", async function(req, res) {
+  const formName = req.body.updateName;
+  await updateName(formName, req.session.user_id)
+  res.redirect("/profile")
 })
 
 app.listen(PORT, () => {
