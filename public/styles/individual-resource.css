@@ -4,7 +4,7 @@
 
 
 .paper {
-    width: 250px;
+    width: 225px;
     height: 150px;
     display: block;
     margin-left: auto;
@@ -26,6 +26,19 @@
 
 }
 
+h1 {
+  margin-left: 10em;
+}
+
+input {
+  width: 50%;
+  margin-left: 19em;
+
+}
+label{
+  margin-right: 8em;
+}
+
 
 .table {
   border-spacing: 0px;
@@ -43,4 +56,19 @@
   border: 2px solid black;
   border-collapse: collapse;
 
+}
+
+.rating {
+  width: 40%;
+  margin-left: 23em;
+}
+
+.thoughts {
+  margin-left: 16em;
+}
+
+.comment-button {
+
+  width: 40%;
+  margin-left: 23em;
 }
