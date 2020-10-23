@@ -1,56 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <title>Home Page</title>
 
-    <link rel="stylesheet" href="/vendor/normalize-4.1.1.css" type="text/css" />
-    <link rel="stylesheet" href="/vendor/border-box.css" type="text/css" />
-    <link rel="stylesheet" href="/styles/layout.css" type="text/css" />
-    <link rel="stylesheet" href="/styles/side-nav.css" type="text/css" />
-    <link rel="stylesheet" href="/styles/individual-resource.css" type="text/css" />
-    <!-- <link rel="stylesheet" href="/vendor/layout.css" type="text/css" /> -->
-    <!-- font -->
-    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue:300,300i,700,700i&display=swap" rel="stylesheet">
-
-    <script type="text/javascript" src="/vendor/jquery-3.0.0.js"></script>
-    <script type="text/javascript" src="/scripts/app.js"></script>
-  </head>
-
-  <body>
-    <div class="sidenav">
-      <a href="/">
-      <img class="brain" src="/images/brain.png">
-    </a>
-      <form id="SearchResources" method="POST" action="/search/:searchQuery">
-        <textarea id="search" name="searchResult"placeholder="Search Resources"></textarea>
-        <button type="submit">Search</button>
-      </form>
-      <form method="POST">
-      <div class="sign-in">
-        <label for="username"><b>Username</b></label>
-        <input type="text" placeholder="Enter Username" name="username" required>
-        <label for="psw"><b>Password</b></label>
-        <input type="password" placeholder="Enter Password" name="psw" required>
-        <button type="submit">Login</button>
-      </div>
-      </form>
-      <div class="register">
-      <a href="/register">Register</a>
-    </div>
-      <div class="categories">
-        <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Categories
-          <span class="caret"></span></button>
-        <ul class="dropdown-menu">
-          <a href="/category/1">Web Development</a>
-          <a href="/category/2">Business</a>
-          <a href="/category/3">Photography</a>
-           <a href="/category/4">Design</a>
-          <a href="/category/5">Science</a>
-        </ul>
-        </div>
-      </div>
-    </div>
-    </div>
+<body>
+  <%- include('partials/index') %>
     <div class="resource">
     <img class="paper" src="/images/paper.png">
 

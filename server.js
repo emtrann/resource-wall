@@ -231,7 +231,7 @@ const { request } = require('express');
 // get root directory - evenutally should be page of resources for guest users
 // AL added below:
 app.get('/', async function (req, res) {
-  const templateVars = { resources: await getResources() };
+  const templateVars = { user: req.session.id, resources: await getResources() };
   res.render('guestpage', templateVars);
 });
 // homepage for users - redirect here after login + shows liked & saved resources
@@ -251,7 +251,7 @@ app.get("/newresource", (req, res) => {
 })
 // route for individual categories
 app.get("/category/:categoryID", async function(req, res) {
-  const templateVars = {
+  const templateVars = { user: req.session.user_id,
     resources: await getResourcesByCategory(req.params.categoryID)
   }
   res.render("categories", templateVars);
@@ -266,7 +266,7 @@ app.get("/register", (req, res) => {
 app.get("/resource/:individualresource", async function(req, res) {
   console.log(req.params.individualresource);
   let newTitle = req.params.individualresource.split('+').join(' ');
-  const templateVars = {
+  const templateVars = { user: req.session.user_id,
     resources: await getIndividualResource(newTitle)
   }
   res.render("individualResource", templateVars)
@@ -274,7 +274,7 @@ app.get("/resource/:individualresource", async function(req, res) {
 // route for search results
 app.get("/search/:searchQuery", async function(req, res) {
   let searchVar = req.params.searchQuery;
-  const templateVars = {
+  const templateVars = { user: req.session.user_id,
     resources: await getSearchResource(searchVar)
   }
   console.log(templateVars)
