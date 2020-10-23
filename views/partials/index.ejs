@@ -4,11 +4,12 @@
 </header>
   <body>
     <div class="sidenav">
-      <a href="/">
+      <a href="/<%=user?'homepage':''%>">
         <img class="brain" src="/images/brain.png">
       </a>
-      <form id="SearchResources" method="GET">
-        <textarea id="search" placeholder="Search Resources"></textarea>
+      <form id="SearchResources" method="POST" action="/search/:searchQuery">
+        <textarea id="search" name="searchResult"placeholder="Search Resources"></textarea>
+        <button type="submit">Search</button>
       </form>
         <div>
         </div>

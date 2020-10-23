@@ -19,8 +19,11 @@ $(() => {
       url: "/",
       data: $(event.target).serialize(),
     }).done((res) => {
-
-      if (!res.user){
+      console.log(res);
+      if (res.success) {
+        console.log("homepage");
+        window.location="/homepage";
+      } else {
         $('.error').slideToggle(1000);
       }
     });;

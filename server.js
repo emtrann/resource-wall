@@ -443,9 +443,12 @@ app.post("/register", async function(req, res) {
       email,
       password
     })
-    req.session.user_id = email; // this is registered user's email
-    console.log('register req.session.user_id: ', req.session.user_id);
-    res.redirect("/homepage");
+    //NEW ----
+    req.session.user_id = email;
+    const templateVars = { resources: await getResourcesForUser(), user: req.session.user_id };
+  res.render("homepage", templateVars);
+    // res.redirect('homepage');
+    // ------
   }
 })
 //login - change username to email **, error to pop up for incorrect password
@@ -461,11 +464,14 @@ app.post("/", async function(req, res) {
     const templateVars = { resources: await getResourcesForUser(), user: req.session.user_id};
     bcrypt.compare(psw, user['password'], function (err, isPasswordMatched) {
       if (isPasswordMatched) {
-        req.session.user_id = username; // this is logged in user's email
-        console.log('3 login req.session.user_id: ', req.session.user_id);
-        res.redirect("/homepage");
+        //NEW ------
+        req.session.user_id = username;
+        //res.redirect("/homepage");
+        res.json({success: true});
+        //-------
       } else {
-        res.render("register", { error: "Incorrect Password", user: user });
+        res.json({error: "Incorrect Password"})
+        //res.render("register", { error: "Incorrect Password", user: user });
       }
     });
   }
