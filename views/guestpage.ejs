@@ -24,7 +24,7 @@
         <tbody>
           <% for(let resource in resources) { %>
             <tr class="table-row">
-              <td><%= resources[resource].title %></td>
+              <td><a href="/resource/<%=resources[resource].title %>"><%= resources[resource].title %></a></td>
               <td><a href ="<%= resources[resource].url %>"><%=resources[resource].url %></a></td>
               <td><%= resources[resource].description %></td>
               <td><%= resources[resource].user %></td>
