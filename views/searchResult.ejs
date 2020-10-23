@@ -6,32 +6,31 @@
     <div class="main">
       <img class="book" src="/images/brain.png">
       <div class="feature" >
+        <% if (resources === null) { %>
+          <span>Your search doesn't match any resource</span>
+          <% } else { %>
+            <table class="table">
+              <thead>
+                <tr class="table-head">
+                  <th scope="col">Title</th>
+                  <th scope="col">Link</th>
+                  <th scope="col">Description</th>
+                  <th scope="col">Added by</th>
 
-      <% for(let resource in resources) { %>
-        <% if (resource === null) { %>
-        <span>Your search doesn't match any resource</span>
-        <% } else { %>
-        <table class="table">
-          <thead>
-            <tr class="table-head">
-              <th scope="col">Title</th>
-              <th scope="col">Link</th>
-              <th scope="col">Description</th>
-              <th scope="col">Added by</th>
-
-            </tr>
-          </thead>
-          <tbody>
-              <tr class="table-row">
-                <td><a href="/resource/<%=resources[resource].title %>"><%= resources[resource].title %></a></td>
-                <td><a href ="<%= resources[resource].url %>"><%=resources[resource].url %></a></td>
-                <td><%= resources[resource].description %></td>
-                <td><%= resources[resource].name %></td>
-              </tr>
-        <% } %>
-          </tbody>
-        </table>
-      <% } %>
+                </tr>
+              </thead>
+              <tbody>
+                <% for(let resource in resources) { %>
+                  <tr class="table-row">
+                    <td><a href="/resource/<%=resources[resource].title %>"><%= resources[resource].title %></a></td>
+                    <td><a href ="<%= resources[resource].url %>"><%=resources[resource].url %></a></td>
+                    <td><%= resources[resource].description %></td>
+                    <td><%= resources[resource].name %></td>
+                  </tr>
+                <% } %>
+              </tbody>
+            </table>
+          <% } %>
       </div>
     </div>
   </body>
