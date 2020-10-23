@@ -25,16 +25,17 @@
         <div>
         </div>
       </form>
-      <form method="POST">
-      <div class="sign-in">
-        <label for="username"><b>Username</b></label>
-        <input type="text" placeholder="Enter Username" name="username" required>
-        <label for="psw"><b>Password</b></label>
-        <input type="password" placeholder="Enter Password" name="psw" required>
-        <button type="submit">Login</button>
-      </div>
+
       </form>
-      <a href="/register">Register</a>
+      <div>
+      </div>
+      <% if (user) { %>
+      <h4 style="margin: 4em" font="bold">Logged In As: <%= user %></h4>
+      <form class="form-inline" method="POST" action="/logout">
+        <button type="submit" class="btn btn-primary">Logout</button>
+      </form>
+      <% } %>
+
       <div class="categories">
         <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Categories
           <span class="caret"></span></button>

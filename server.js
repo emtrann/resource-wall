@@ -27,22 +27,29 @@ pool.connect();
 // Query function to database to get all resources
 const getResources = function () {
   let queryString = `
-  SELECT *
-  FROM resources;`;
+  SELECT name, category_name, url, title, description
+  FROM resources
+  JOIN users ON user_id = users.id;
+  `;
   const query = {
     text: queryString,
     rowMode: 'array'
   }
   return pool.query(query)
     .then(res => (res.rows.map(row => ({
-      user: row[1],
-      category: row[2],
-      url: row[3],
-      title: row[4],
-      description: row[5]
+      user: row[0],
+      category: row[1],
+      url: row[2],
+      title: row[3],
+      description: row[4]
     }))))
     .catch(err => console.error('query error', err.stack));
 };
+const asyncGetResources = async function() {
+  console.log('get all resources: ', await getResources());
+}
+asyncGetResources();
+
 // Query function to get resources for one user
 const getResourcesForUser = function(email) {
   let queryString = `
@@ -70,7 +77,7 @@ const getResourcesByCategory = function(category) {
   SELECT *
   FROM resources
   JOIN users ON user_id = users.id
-  WHERE category_id = $1;`;
+  WHERE category_name = $1;`;
   const query = {
     text: queryString,
     rowMode: 'array'
@@ -147,10 +154,10 @@ const getUserId = function () {
   `)
   .then(res => res.rows[0].id)
 };
-const asyncUserId = async function() {
-  console.log('user ID: ', await getUserId());
-}
-asyncUserId();
+// const asyncUserId = async function() {
+//   console.log('user ID: ', await getUserId());
+// }
+// asyncUserId();
 // Query function - add new user to db
 const addNewUser = function (user) {
   return pool.query(`
@@ -247,7 +254,8 @@ app.get("/homepage", async function(req, res) {
 })
 // route to make a new resource
 app.get("/newresource", (req, res) => {
-  res.render("newResource")
+  const templateVars = { user: req.session.user_id };
+  res.render("newResource", templateVars);
 })
 // route for individual categories
 app.get("/category/:categoryID", async function(req, res) {
@@ -299,7 +307,7 @@ app.post("/search/:searchQuery", function(req, res) {
   res.redirect(`/search/${searchQueryUrl}`)
 })
 app.post("/newresource", async function(req, res) {
-  const userId = 1; //req.session.userId;//await getUserId(); // gets value from db through query function
+  const userId = await getUserId(); // gets value from db through query function
   const title = req.body.title;
   const description = req.body.description;
   const url = req.body.url;
@@ -331,7 +339,8 @@ app.post("/register", async function(req, res) {
       email,
       password
     })
-    req.session.user_id = email;
+    req.session.user_id = email; // this is registered user's email
+    console.log('register req.session.user_id: ', req.session.user_id);
     res.redirect("/homepage");
   }
 })
@@ -339,8 +348,8 @@ app.post("/register", async function(req, res) {
 app.post("/", async function(req, res) {
   const { username, psw } = req.body;
   let user = await findUserCredentials(username);
-  console.log(req.body);
-  console.log(user)
+  console.log('1 req.body: ', req.body);
+  console.log('2 user: ', user)
   if (!user) {
     res.status(403).json({ message: "Email cannot be found" });
   } else if (user) {
@@ -348,7 +357,8 @@ app.post("/", async function(req, res) {
     const templateVars = { resources: await getResourcesForUser(), user: req.session.user_id};
     bcrypt.compare(psw, user['password'], function (err, isPasswordMatched) {
       if (isPasswordMatched) {
-        req.session.user_id = username;
+        req.session.user_id = username; // this is logged in user's email
+        console.log('3 login req.session.user_id: ', req.session.user_id);
         res.redirect("/homepage");
       } else {
         res.render("register", { error: "Incorrect Password", user: user });
