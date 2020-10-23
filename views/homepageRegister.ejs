@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<body>
+  <%- include('partials/index') %>
+  <div class="main">
+
+    <img class="book" src="/images/myresources.png">
+
+
+    <div class="feature" >
+
+
+      <table class="table">
+        <thead>
+          <tr class="table-head">
+            <th scope="col">Title</th>
+            <th scope="col">Link</th>
+            <th scope="col">Description</th>
+
+
+          </tr>
+        </thead>
+        <tbody>
+          <% for(let resource in resources) { %>
+            <tr class="table-row">
+              <td><a href="/resource/<%=resources[resource].title %>"><%= resources[resource].title %></a></td>
+              <td><%= resources[resource].url %></td>
+              <td><%= resources[resource].description %></td>
+              <td><%= resources[resource].category %></td>
+
+              <td><%= resources[resource].user %></td>
+            </tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</body>
+</html>
