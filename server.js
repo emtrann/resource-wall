@@ -45,10 +45,10 @@ const getResources = function () {
     }))))
     .catch(err => console.error('query error', err.stack));
 };
-const asyncGetResources = async function() {
-  console.log('get all resources: ', await getResources());
-}
-asyncGetResources();
+// const asyncGetResources = async function() {
+//   console.log('get all resources: ', await getResources());
+// }
+// asyncGetResources();
 
 // Query function to get resources for one user
 const getResourcesForUser = function(email) {
@@ -375,7 +375,7 @@ app.get("/search/:searchQuery", async function(req, res) {
   const templateVars = { user: req.session.user_id,
     resources: await getSearchResource(searchVar)
   }
-  console.log(templateVars)
+  // console.log('2 search result: ', templateVars)
   res.render("searchResult", templateVars)
 })
 // profile route
@@ -393,6 +393,7 @@ app.get("/profile", async function(req, res) {
 // inputs form into end of query to get search results
 app.post("/search/:searchQuery", function(req, res) {
   let searchQueryUrl = req.params.searchQuery;
+  // console.log('1 searchQueryUrl: ', searchQueryUrl)
   searchQueryUrl = req.body.searchResult;
   res.redirect(`/search/${searchQueryUrl}`)
 })
