@@ -154,14 +154,6 @@ const getUserId = function (email) {
   `, [email])
   .then(res => res.rows[0].id)
 };
-<<<<<<< HEAD
-
-=======
-// const asyncUserId = async function() {
-//   console.log('user ID: ', await getUserId());
-// }
-// asyncUserId();
->>>>>>> newresource-page
 // Query function - add new user to db
 const addNewUser = function (user) {
   return pool.query(`
@@ -381,11 +373,7 @@ app.post("/resource/:individualresource", async function(req, res) {
 })
 
 app.post("/newresource", async function(req, res) {
-<<<<<<< HEAD
   const userId = await getUserId(req.session.user_id)
-=======
-  const userId = await getUserId(); // gets value from db through query function
->>>>>>> newresource-page
   const title = req.body.title;
   const description = req.body.description;
   const url = req.body.url;
