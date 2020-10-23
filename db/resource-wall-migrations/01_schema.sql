@@ -8,6 +8,6 @@ CREATE TABLE users (
   password VARCHAR(255) NOT NULL
 );
 CREATE TABLE categories (
-  id SERIAL PRIMARY KEY,
-  name VARCHAR(255) NOT NULL
+  id SERIAL,
+  name VARCHAR(255) PRIMARY KEY NOT NULL
 );
