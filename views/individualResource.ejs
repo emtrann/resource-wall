@@ -30,6 +30,11 @@
           <% } %>
       </table>
     </div>
+
+    <h4>Rating:
+      <%= Math.round(rating[0]['avg'] * 100) / 100 %> / 5
+    </h4>
+
     <% if (user) { %>
     <form method="POST" action="/resource/:individualresource/liked">
       <div class="likes">
@@ -37,14 +42,11 @@
     </form>
 
   </div>
-  <form method="POST">
-    <div class="rating">
+  <form method="POST" action="/resource/:individualresource/rating">
+    <div>
 
-        <button type="submit">1</button>
-        <button type="submit">2</button>
-        <button type="submit">3</button>
-        <button type="submit">4</button>
-        <button type="submit">5</button>
+      <input type="number" id="rating" name="rate"
+      min="1" max="5">
 
       <button type="submit">Leave Rating</button>
   </form>

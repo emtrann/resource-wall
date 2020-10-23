@@ -260,11 +260,6 @@ const addUserLike = function(user, resource) {
   .catch(err => console.error('query error', err.stack));
 }
 
-// const asyncLike = async function() {
-//   console.log(await addUserLike(2, 5));
-// }
-
-// asyncLike();
 
 // gets all resources that are liked by a user
 const likedByUser = function(user) {
@@ -300,6 +295,27 @@ const updateName = function(newName, email) {
   WHERE email = $2
   `, [newName, email])
   .then(res => res.rows[0]);
+}
+
+// adds user rating to db
+const addRating = function(currentUser, rate , resource) {
+  return pool.query(`
+  INSERT INTO resource_ratings(user_id, rating, resource_id)
+  VALUES($1, $2, $3)
+  RETURNING *;
+  `, [currentUser, rate, resource])
+  .then(res => res.rows)
+  .catch(err => console.error('query error', err.stack));
+}
+
+const avgRating = function(resource) {
+  return pool.query(`
+  SELECT AVG(rating)
+  FROM resource_ratings
+  WHERE resource_id = $1;
+  `, [resource])
+  .then(res => res.rows)
+  .catch(err => console.error('query error', err.stack));
 }
 
 // Load the logger first so all (static) HTTP requests are logged to STDOUT
@@ -381,9 +397,16 @@ app.get("/resource/:individualresource", async function(req, res) {
   let newTitle = req.params.individualresource.split('%20').join(' ');
   let idForResource = await findResourceIdByTitle(newTitle)
 
+  let resParam = req.params.individualresource
+  console.log('meow', resParam)
+  const resourceVar = await findResourceIdByTitle(resParam);
+  const blah = await avgRating(resourceVar['id'])
+  console.log(blah[0]['avg'])
+
   const templateVars = { user: req.session.user_id,
     resources: await getIndividualResource(newTitle),
-    comments: await getAllComments(idForResource['id'])
+    comments: await getAllComments(idForResource['id']),
+    rating: await avgRating(resourceVar['id'])
   }
   res.render("individualResource", templateVars)
 })
@@ -510,6 +533,17 @@ app.post("/resource/:individualresource/liked", async function(req, res) {
   let resourceVar = await findResourceIdByTitle(resParam);
   addUserLike(user, resourceVar['id'])
   res.redirect("/homepage")
+})
+
+app.post("/resource/:individualresource/rating", async function(req, res) {
+  const rate = req.body.rate;
+  const user = await getUserId(req.session.user_id);
+  let resParam = req.params.individualresource
+  const urlString = req.headers.referer.split('/');
+  resParam = urlString[urlString.length-1].split('%20').join(' ');
+  const resourceVar = await findResourceIdByTitle(resParam);
+  addRating(user, rate, resourceVar['id'])
+  res.redirect('back');
 })
 
 app.post("/update/name", async function(req, res) {
