@@ -198,8 +198,8 @@ const findUserCredentials = function(email) {
 // Query function - adds new comment to db
 const addComment = function(commentObj) {
   return pool.query(`
-  INSERT INTO comments (resource_id, message, date)
-  VALUES ($1, $2, $3);`, [commentObj.resourceId, commentObj.message, 'NOW()'])
+  INSERT INTO comments (user_id, resource_id, message, date)
+  VALUES ($1, $2, $3, $4);`, [commentObj.userId, commentObj.resourceId, commentObj.message, 'NOW()'])
   .then(res => res.rows)
   .catch(err => console.error('query error', err.stack));
 }
@@ -217,8 +217,9 @@ const findResourceIdByTitle = function(title) {
 // returns all comment messages and dates from db
 const getAllComments = function(individualResource) {
   const queryString = `
-  SELECT message, date
+  SELECT message, date, users.name
   FROM comments
+  JOIN users ON user_id = users.id
   WHERE resource_id = $1;
   `
 
@@ -231,6 +232,7 @@ const getAllComments = function(individualResource) {
   .then(res => (res.rows.map(row => ({
     message: row[0],
     date: row[1],
+    user: row[2],
   }))))
 }
 
@@ -356,7 +358,8 @@ app.post("/resource/:individualresource", async function(req, res) {
   let resourceVar = await findResourceIdByTitle(resParam);
   addComment({
     message: req.body.cmt,
-    resourceId: resourceVar['id']
+    resourceId: resourceVar['id'],
+    user_id: await getUserId(req.session.user_id)
   })
   console.log(req.body)
   res.redirect('back');
