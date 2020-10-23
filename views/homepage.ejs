@@ -64,8 +64,9 @@
         <thead>
           <tr class="table-head">
             <th scope="col">Title</th>
+            <th scope="col">Link</th>
+            <th scope="col">Description</th>
 
-            <th scope="col">Added by</th>
 
           </tr>
         </thead>
@@ -73,8 +74,8 @@
           <% for(let resource in resources) { %>
             <tr class="table-row">
               <td><%= resources[resource].title %></td>
-
-              <td><%= resources[resource].user %></td>
+              <td><a href ="<%= resources[resource].url %>"><%=resources[resource].url %></a></td>
+              <td><%= resources[resource].description %></td>
             </tr>
           <% } %>
         </tbody>
@@ -86,9 +87,11 @@
     <table class="liked-content">
       <thead>
         <tr class ="likes-head"></tr>
-        <th scope="col">Title</th>
-        <th scope="col">Description</th>
-      </tr>
+          <th scope="col">Title</th>
+          <th scope="col">Link</th>
+          <th scope="col">Description</th>
+          <th scope="col">Added by</th>
+        </tr>
       </thead>
       <tbody>
         <% for(let resource in resources) { %>
