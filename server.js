@@ -46,7 +46,6 @@ const getResources = function () {
     .catch(err => console.error('query error', err.stack));
 };
 
-
 // Query function to get resources for one user
 const getResourcesForUser = function(email) {
   let queryString = `
@@ -139,7 +138,7 @@ const getSearchResource = function(searchStr) {
 // Query function - add new resource to db
 const addNewResource = function (resource) {
   return pool.query(`
-  INSERT INTO resources (user_id, category_id, url, title, description)
+  INSERT INTO resources (user_id, category_name, url, title, description)
   VALUES ($1, $2, $3, $4, $5)
   RETURNING *;
   `, [resource.userId, resource.category, resource.url, resource.title, resource.description])
@@ -416,7 +415,7 @@ app.get("/search/:searchQuery", async function(req, res) {
   const templateVars = { user: req.session.user_id,
     resources: await getSearchResource(searchVar)
   }
-  console.log(templateVars)
+  // console.log('2 search result: ', templateVars)
   res.render("searchResult", templateVars)
 })
 // profile route
@@ -435,6 +434,7 @@ app.get("/profile", async function(req, res) {
 // inputs form into end of query to get search results
 app.post("/search/:searchQuery", function(req, res) {
   let searchQueryUrl = req.params.searchQuery;
+  // console.log('1 searchQueryUrl: ', searchQueryUrl)
   searchQueryUrl = req.body.searchResult;
   res.redirect(`/search/${searchQueryUrl}`)
 })
@@ -455,19 +455,18 @@ app.post("/resource/:individualresource", async function(req, res) {
 })
 
 app.post("/newresource", async function(req, res) {
-  const userId = await getUserId(req.session.user_id)
+  const userId = await getUserId(req.session.user_id);
   const title = req.body.title;
   const description = req.body.description;
   const url = req.body.url;
-  const category = 4; //req.body.category; // this should be just a number, unless we change db to accept names
-  let newResource = {
+  const category = req.body.category;
+  addNewResource({
     userId,
     category,
     url,
     title,
     description
-  };
-  addNewResource(newResource);
+  });
   res.redirect('/homepage');
 })
 app.post("/register", async function(req, res) {
@@ -490,7 +489,7 @@ app.post("/register", async function(req, res) {
     //NEW ----
     req.session.user_id = email;
     const templateVars = { resources: await getResourcesForUser(), user: req.session.user_id };
-  res.render("homepage", templateVars);
+  res.render("homepageRegister", templateVars);
     // res.redirect('homepage');
     // ------
   }
