@@ -45,10 +45,7 @@ const getResources = function () {
     }))))
     .catch(err => console.error('query error', err.stack));
 };
-const asyncGetResources = async function() {
-  console.log('get all resources: ', await getResources());
-}
-asyncGetResources();
+
 
 // Query function to get resources for one user
 const getResourcesForUser = function(email) {
@@ -146,14 +143,21 @@ const addNewResource = function (resource) {
   .then(res => res.rows)
   .catch(err => console.error('query error', err.stack));
 };
+
 const getUserId = function (email) {
   return pool.query( `
   SELECT id
   FROM users
   WHERE email = $1;
   `, [email])
-  .then(res => res.rows[0].id)
+  .then(res => res.rows[0].id);
 };
+
+const asyncId = async function() {
+  console.log(await getUserId('tristanjacobs@gmail.com'))
+}
+
+asyncId();
 // Query function - add new user to db
 const addNewUser = function (user) {
   return pool.query(`
@@ -360,7 +364,7 @@ app.get("/register", (req, res) => {
 // route for individual resources
 app.get("/resource/:individualresource", async function(req, res) {
   console.log('this is inside get', req.params.individualresource);
-  let newTitle = req.params.individualresource.split('+').join(' ');
+  let newTitle = req.params.individualresource.split('%20').join(' ');
   let idForResource = await findResourceIdByTitle(newTitle)
 
   const templateVars = { user: req.session.user_id,
@@ -401,12 +405,12 @@ app.post("/resource/:individualresource", async function(req, res) {
   console.log('look at me', req.body.cmt)
   let resParam = req.params.individualresource
   const urlString = req.headers.referer.split('/');
-  resParam = urlString[urlString.length-1].split('+').join(' ');
-  let resourceVar = await findResourceIdByTitle(resParam);
+  resParam = urlString[urlString.length-1].split('%20').join(' ');
+  const resourceVar = await findResourceIdByTitle(resParam);
   addComment({
     message: req.body.cmt,
     resourceId: resourceVar['id'],
-    user_id: await getUserId(req.session.user_id)
+    userId: await getUserId(req.session.user_id)
   })
   console.log(req.body)
   res.redirect('back');
@@ -489,7 +493,7 @@ app.post("/resource/:individualresource/liked", async function(req, res) {
   console.log('inside likes', req.params)
   let resParam = req.params.individualresource
   const urlString = req.headers.referer.split('/');
-  resParam = urlString[urlString.length-1].split('+').join(' ');
+  resParam = urlString[urlString.length-1].split('%20').join(' ');
   let resourceVar = await findResourceIdByTitle(resParam);
   console.log('inside likes', resourceVar['id']);
   addUserLike(user, resourceVar['id'])
