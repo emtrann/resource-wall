@@ -139,7 +139,7 @@ const getSearchResource = function(searchStr) {
 // Query function - add new resource to db
 const addNewResource = function (resource) {
   return pool.query(`
-  INSERT INTO resources (user_id, category_name, url, title, description)
+  INSERT INTO resources (user_id, category_id, url, title, description)
   VALUES ($1, $2, $3, $4, $5)
   RETURNING *;
   `, [resource.userId, resource.category, resource.url, resource.title, resource.description])
@@ -285,7 +285,7 @@ const { request } = require('express');
 // get root directory - evenutally should be page of resources for guest users
 // AL added below:
 app.get('/', async function (req, res) {
-  const templateVars = { resources: await getResources() };
+  const templateVars = { user: req.session.id, resources: await getResources() };
   res.render('guestpage', templateVars);
 });
 // homepage for users - redirect here after login + shows liked & saved resources
@@ -306,7 +306,7 @@ app.get("/newresource", (req, res) => {
 })
 // route for individual categories
 app.get("/category/:categoryID", async function(req, res) {
-  const templateVars = {
+  const templateVars = { user: req.session.user_id,
     resources: await getResourcesByCategory(req.params.categoryID)
   }
   res.render("categories", templateVars);
@@ -323,7 +323,7 @@ app.get("/resource/:individualresource", async function(req, res) {
   let newTitle = req.params.individualresource.split('+').join(' ');
   let idForResource = await findResourceIdByTitle(newTitle)
 
-  const templateVars = {
+  const templateVars = { user: req.session.user_id,
     resources: await getIndividualResource(newTitle),
     comments: await getAllComments(idForResource['id'])
   }
@@ -332,7 +332,7 @@ app.get("/resource/:individualresource", async function(req, res) {
 // route for search results
 app.get("/search/:searchQuery", async function(req, res) {
   let searchVar = req.params.searchQuery;
-  const templateVars = {
+  const templateVars = { user: req.session.user_id,
     resources: await getSearchResource(searchVar)
   }
   console.log(templateVars)
@@ -377,15 +377,15 @@ app.post("/newresource", async function(req, res) {
   const title = req.body.title;
   const description = req.body.description;
   const url = req.body.url;
-  const category = req.body.category;
-  addNewResource ({
+  const category = 4; //req.body.category; // this should be just a number, unless we change db to accept names
+  let newResource = {
     userId,
     category,
     url,
     title,
     description
-  });
-
+  };
+  addNewResource(newResource);
   res.redirect('/homepage');
 })
 app.post("/register", async function(req, res) {
