@@ -89,6 +89,12 @@ const getResourcesByCategory = function(category) {
   }))))
   .catch(err => console.error('query error', err.stack));
 }
+
+const asyncFunc = async function() {
+  console.log(await getResourcesByCategory('Science'))
+}
+
+asyncFunc()
 // Query - gets individual resource in db
 const getIndividualResource = function(resourceTitle) {
   let queryString = `
@@ -380,8 +386,10 @@ app.get("/newresource", (req, res) => {
 
 // route for individual categories
 app.get("/category/:categoryID", async function(req, res) {
+  let urlParam = req.params.categoryID.split('%20').join(' ')
+  console.log('url param', urlParam)
   const templateVars = { user: req.session.user_id,
-    resources: await getResourcesByCategory(req.params.categoryID)
+    resources: await getResourcesByCategory(urlParam)
   }
   res.render("categories", templateVars);
 })
