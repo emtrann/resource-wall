@@ -236,14 +236,47 @@ const getAllComments = function(individualResource) {
   }))))
 }
 
-const asyncComments = async function() {
-  let allComments = await getAllComments(2)
-  console.log(allComments);
-  console.log(allComments[0].message)
+// adds like to resource from specific user
+const addUserLike = function(user, resource) {
+  return pool.query(`
+  INSERT INTO user_likes(user_id, resource_id)
+  VALUES($1, $2)
+  RETURNING *;
+  `, [user, resource])
+  .then(res => res.rows)
+  .catch(err => console.error('query error', err.stack));
 }
 
-asyncComments();
+// const asyncLike = async function() {
+//   console.log(await addUserLike(2, 5));
+// }
 
+// asyncLike();
+
+// gets all resources that are liked by a user
+const likedByUser = function(user) {
+  let queryString = `
+  SELECT DISTINCT ON (resource_id) *
+  FROM user_likes
+  JOIN resources on resource_id = resources.id
+  WHERE user_likes.user_id = $1;
+  `;
+
+  const query = {
+    text: queryString,
+    rowMode: 'array'
+  }
+
+  return pool.query(query, [user])
+  .then(res => (res.rows.map(row => ({
+    name: row[1],
+    category: row[5],
+    url: row[6],
+    title: row[7],
+    description: row[8]
+  }))))
+  .catch(err => console.error('query error', err.stack));
+}
 
 // Load the logger first so all (static) HTTP requests are logged to STDOUT
 // 'dev' = Concise output colored by response status for development use.
@@ -288,15 +321,20 @@ app.get("/homepage", async function(req, res) {
   if (!req.session.user_id) {
     res.redirect('/register');
   }
+
+  let userId = await getUserId(req.session.user_id)
   const templateVars = {
     user: req.session.user_id,
-    resources: await getResourcesForUser(req.session.user_id) };
+    resources: await getResourcesForUser(req.session.user_id),
+    likedResources: await likedByUser(userId) };
   res.render("homepage", templateVars);
 })
+
 // route to make a new resource
 app.get("/newresource", (req, res) => {
   res.render("newResource")
 })
+
 // route for individual categories
 app.get("/category/:categoryID", async function(req, res) {
   const templateVars = { user: req.session.user_id,
@@ -429,6 +467,20 @@ app.post("/logout", (req, res) => {
   req.session = null;
   res.redirect("/");
 })
+
+app.post("/resource/:individualresource/liked", async function(req, res) {
+  let user = await getUserId(req.session.user_id);
+  console.log('this inside liked', user);
+  console.log('inside likes', req.params)
+  let resParam = req.params.individualresource
+  const urlString = req.headers.referer.split('/');
+  resParam = urlString[urlString.length-1].split('+').join(' ');
+  let resourceVar = await findResourceIdByTitle(resParam);
+  console.log('inside likes', resourceVar['id']);
+  addUserLike(user, resourceVar['id'])
+  res.redirect("/homepage")
+})
+
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}`);
 });
