@@ -3,7 +3,7 @@
 
 <body>
   <%- include('partials/index') %>
-    <div class="resource">
+  <div class="resource">
     <img class="paper" src="/images/paper.png">
 
     <div class="feature">
@@ -46,13 +46,25 @@
     <input type="comment" placeholder="Leave comment here" name="cmt" required>
     <button type="submit">Comment</button>
   </form>
-  <% for(let comment in comments) { %>
-    <tr class="table-row">
-      <td><%= comments[comment].message %></td>
-      <td><%= comments[comment].date %></td>
-      <td><%= comments[comment].user %></td> <br>
-    </tr>
-    <% } %>
+  <table class="table">
+    <thead>
+      <tr class="table-head">
+        <th scope="col">Comment</th>
+        <th scope="col">Date posted</th>
+        <th scope="col">Written by</th>
+
+
+      </tr>
+    </thead>
+    <tbody>
+      <% for(let comment in comments) { %>
+      <tr class="table-row">
+        <td><%= comments[comment].message %></td>
+        <td><%= comments[comment].date %></td>
+        <td><%= comments[comment].user %></td> <br>
+      </tr>
+      <% } %>
+  </table>
   </div>
 </body>
 

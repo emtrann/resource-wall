@@ -111,6 +111,9 @@ const getIndividualResource = function(resourceTitle) {
   }))))
   .catch(err => console.error('query error', err.stack));
 }
+
+
+
 // Query - goes through db using search form - only searches through title, url and description atm
 const getSearchResource = function(searchStr) {
   let queryString = `
@@ -268,7 +271,8 @@ const likedByUser = function(user) {
   let queryString = `
   SELECT DISTINCT ON (resource_id) *
   FROM user_likes
-  JOIN resources on resource_id = resources.id
+  JOIN resources ON resource_id = resources.id
+  JOIN users ON resources.user_id = users.id
   WHERE user_likes.user_id = $1;
   `;
 
@@ -279,7 +283,7 @@ const likedByUser = function(user) {
 
   return pool.query(query, [user])
   .then(res => (res.rows.map(row => ({
-    name: row[1],
+    name: row[10],
     category: row[5],
     url: row[6],
     title: row[7],
@@ -489,13 +493,10 @@ app.post("/logout", (req, res) => {
 
 app.post("/resource/:individualresource/liked", async function(req, res) {
   let user = await getUserId(req.session.user_id);
-  console.log('this inside liked', user);
-  console.log('inside likes', req.params)
   let resParam = req.params.individualresource
   const urlString = req.headers.referer.split('/');
   resParam = urlString[urlString.length-1].split('%20').join(' ');
   let resourceVar = await findResourceIdByTitle(resParam);
-  console.log('inside likes', resourceVar['id']);
   addUserLike(user, resourceVar['id'])
   res.redirect("/homepage")
 })
