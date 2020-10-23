@@ -73,6 +73,9 @@
           <% for(let resource in resources) { %>
             <tr class="table-row">
               <td><%= resources[resource].title %></td>
+              <td><%= resources[resource].url %></td>
+              <td><%= resources[resource].description %></td>
+              <td><%= resources[resource].category %></td>
 
               <td><%= resources[resource].user %></td>
             </tr>
@@ -91,11 +94,13 @@
       </tr>
       </thead>
       <tbody>
-        <% for(let resource in resources) { %>
+        <% for(let likedResource in likedResources) { %>
           <tr class="like-row">
-            <td><%= resources[resource].title %></td>
-
-            <td><%= resources[resource].user %></td>
+            <td><%= likedResources[likedResource].title %></td>
+            <td><%= likedResources[likedResource].url %></td>
+            <td><%= likedResources[likedResource].description %></td>
+            <td><%= likedResources[likedResource].category %></td>
+            <td><%= likedResources[likedResource].user %></td>
           </tr>
         <% } %>
       </tbody>
