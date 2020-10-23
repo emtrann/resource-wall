@@ -318,7 +318,9 @@ const { request } = require('express');
 // get root directory - evenutally should be page of resources for guest users
 // AL added below:
 app.get('/', async function (req, res) {
-  const templateVars = { user: req.session.id, resources: await getResources() };
+  const resources = await getResources();
+  console.log("This is the resources: ", resources);
+  const templateVars = { user: req.session.id, resources };
   res.render('guestpage', templateVars);
 });
 // homepage for users - redirect here after login + shows liked & saved resources
