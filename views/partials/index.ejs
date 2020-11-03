@@ -13,7 +13,6 @@
   <script type="text/javascript" defer src="/scripts/app.js"></script>
   <script type="text/javascript" src="/scripts/login-on-click.js"></script>
   <script type="text/javascript" src="/scripts/categories-on-click.js"></script>
-
 </header>
   <body>
     <div class="sidenav">
@@ -28,6 +27,9 @@
         </div>
         <% if (user) { %>
         <h4 style="margin: 4em" font="bold">Logged In As: <%= user %></h4>
+        <form class=form-inline method="GET" action="/profile">
+          <button type="submit" class btn btn-primary">Update Profile</button>
+          </form>
         <form class="form-inline" method="POST" action="/logout">
           <button type="submit" class="btn btn-primary">Logout</button>
         </form>
@@ -40,8 +42,7 @@
           <button id="login-button">
             <span>Login</span>
             </button>
-
-          <form id="login-form" method="POST" action="/">
+          <form id="login-form">
           <div class="sign-in">
             <label  for="username"><b>Email</b></label>
             <input type="text" placeholder="Enter Email" name="username" required>
@@ -60,14 +61,11 @@
           </button>
           <form id ="category-form">
         <div class="categories">
-
-
-            <a href="/category/Software%20Development">Software Development</a>
-            <a href="/category/Business">Business</a>
-            <a href="/category/Photography">Photography</a>
-             <a href="/category/Design">Design</a>
-            <a href="/category/Science">Science</a>
-
+          <a href="/category/Software%20Development">Software Development</a>
+          <a href="/category/Business">Business</a>
+          <a href="/category/Photography">Photography</a>
+           <a href="/category/Design">Design</a>
+          <a href="/category/Science">Science</a>
           </div>
         </form>
         </div>
